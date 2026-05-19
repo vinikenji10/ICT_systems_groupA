@@ -1,0 +1,437 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F4F1EA;
+  color: #111111;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background-color: #0C4A34;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.navbar-brand img {
+  height: 36px;
+  width: auto;
+}
+
+.navbar-brand span {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.navbar-search {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 24px;
+  position: relative;
+}
+
+.navbar-search input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.navbar-search input::placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.navbar-search input:focus {
+  background-color: rgba(255,255,255,0.25);
+}
+
+.navbar-search .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  list-style: none;
+}
+
+.navbar-links a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.navbar-links a:hover {
+  color: #fff;
+}
+
+.navbar-links .leader-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background-color: #fff;
+  border-right: 1px solid #e5e1d8;
+  padding: 24px 20px;
+  height: calc(100vh - 64px);
+  position: sticky;
+  top: 64px;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #0C4A34;
+  margin-bottom: 16px;
+}
+
+.filter-group {
+  margin-bottom: 28px;
+}
+
+.filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4A4A4A;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.filter-group input[type="checkbox"] {
+  accent-color: #0C4A34;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  padding: 28px 32px;
+  min-width: 0;
+}
+
+.slogan {
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #0C4A34;
+  margin-bottom: 4px;
+}
+
+.slogan-sub {
+  font-size: 14px;
+  color: #4A4A4A;
+  margin-bottom: 28px;
+}
+
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.club-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.club-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.club-card-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  background-color: #e5e1d8;
+}
+
+.club-card-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.club-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.club-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tag-recruiting {
+  background-color: #E6D7C3;
+  color: #0C4A34;
+}
+
+.tag-competitive {
+  background-color: #d4e8dc;
+  color: #0C4A34;
+}
+
+.tag-recreational {
+  background-color: #e8e0d4;
+  color: #5a4a3a;
+}
+
+.tag-active {
+  background-color: #c8e0d4;
+  color: #0C4A34;
+}
+
+.tag-sport {
+  background-color: #e5e1d8;
+  color: #4A4A4A;
+}
+
+.club-card-desc {
+  font-size: 13px;
+  color: #4A4A4A;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.club-card-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #0C4A34;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.club-card-btn:hover {
+  background-color: #0a3d2b;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #4A4A4A;
+  font-size: 16px;
+}
+
+.footer {
+  background-color: #0C4A34;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  padding: 20px 32px;
+  font-size: 13px;
+  margin-top: auto;
+}
+
+.footer a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #fff;
+}
+
+.mobile-filter-toggle {
+  display: none;
+  background: #0C4A34;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .club-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
+  }
+  .club-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 56px;
+  }
+
+  .navbar-search {
+    margin: 0 12px;
+  }
+
+  .navbar-links .nav-hide-mobile {
+    display: none;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .sidebar-open .sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 200;
+    border-right: none;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+  }
+
+  .sidebar-open .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 199;
+  }
+
+  .mobile-filter-toggle {
+    display: block;
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+
+  .club-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .slogan {
+    font-size: 18px;
+  }
+
+  .club-card-image {
+    height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-brand span {
+    font-size: 14px;
+  }
+
+  .navbar-search input {
+    padding: 8px 12px 8px 34px;
+    font-size: 13px;
+  }
+
+  .club-grid {
+    grid-template-columns: 1fr;
+  }
+}

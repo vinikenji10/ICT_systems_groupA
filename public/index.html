@@ -1,111 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICT Systems Design Project - Group A</title>
-    <style>
-        /* Basic reset and typography */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f7f6; /* Very light gray background */
-            color: #333;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* Main container "Card" style */
-        .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            padding: 50px 40px;
-            max-width: 800px;
-            width: 90%;
-            text-align: center;
-        }
-
-        /* Header area */
-        header {
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            max-width: 280px; /* Adjustable size for the SIT logo */
-            height: auto;
-            margin-bottom: 25px;
-        }
-
-        h1 {
-            color: #1a202c;
-            font-size: 2.5em;
-            margin: 0 0 10px 0;
-            letter-spacing: -0.5px;
-        }
-
-        h2 {
-            color: #3182ce; /* Blue to highlight the group */
-            font-weight: 400;
-            font-size: 1.5em;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Subtle divider */
-        hr {
-            border: 0;
-            height: 1px;
-            background: #e2e8f0;
-            margin: 30px 0;
-        }
-
-        /* Area for customized information */
-        .content-section {
-            text-align: left;
-            background-color: #f8fafc;
-            padding: 30px;
-            border-radius: 8px;
-            border-left: 4px solid #3182ce;
-            min-height: 200px;
-            line-height: 1.6;
-        }
-
-        .content-section h3 {
-            margin-top: 0;
-            color: #2d3748;
-            font-size: 1.2em;
-        }
-
-        .content-section p {
-            color: #4a5568;
-            margin-bottom: 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIT Club Hub — Explore Student Clubs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <img src="https://firebasestorage.googleapis.com/v0/b/ict-systems-project-a.firebasestorage.app/o/Assets%2FShibaura_Institute_of_Technology_logo.svg.png?alt=media&token=4c5c6f60-96a7-41e9-a5f0-6b6ed4518ba3" alt="Shibaura Institute of Technology Logo" class="logo">
-            
-            <h1>ICT Systems Design Project</h1>
-            <h2>Group A</h2>
-        </header>
-
-        <hr>
-
-        <main class="content-section">
-            <h3>Project Overview</h3>
-            <p>
-                This space is reserved for you to add project information. 
-                You can write about the system architecture, team objectives, technologies used, or any other relevant documentation.
-            </p>
-        </main>
+  <nav class="navbar">
+    <a href="#" class="navbar-brand">
+      <img src="https://firebasestorage.googleapis.com/v0/b/ict-systems-project-a.firebasestorage.app/o/Assets%2FShibaura_Institute_of_Technology_logo.svg.png?alt=media&token=4c5c6f60-96a7-41e9-a5f0-6b6ed4518ba3" alt="SIT Logo">
+      <span>SIT Club Hub</span>
+    </a>
+    <div class="navbar-search">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" id="searchInput" placeholder="Search clubs by name or sport...">
     </div>
+    <ul class="navbar-links">
+      <li><a href="#" class="nav-hide-mobile">Explore Clubs</a></li>
+      <li><a href="#" class="nav-hide-mobile">Events</a></li>
+      <li><a href="#" class="leader-link"><span class="nav-hide-mobile">Leader Login</span> &#x1F464;</a></li>
+      <li><a href="#" class="nav-hide-mobile">Support</a></li>
+    </ul>
+  </nav>
 
+  <div class="layout">
+
+    <aside class="sidebar" id="sidebar">
+      <h3>Filter Clubs</h3>
+
+      <div class="filter-group">
+        <h3>Sport Type</h3>
+        <label><input type="checkbox" class="filter-checkbox" data-group="sportType" data-value="Teams"> Teams</label>
+        <label><input type="checkbox" class="filter-checkbox" data-group="sportType" data-value="Martial Arts"> Martial Arts</label>
+        <label><input type="checkbox" class="filter-checkbox" data-group="sportType" data-value="Individual"> Individual</label>
+      </div>
+
+      <div class="filter-group">
+        <h3>Activity Level</h3>
+        <label><input type="checkbox" class="filter-checkbox" data-group="activityLevel" data-value="Competitive"> Competitive</label>
+        <label><input type="checkbox" class="filter-checkbox" data-group="activityLevel" data-value="Recreational"> Recreational</label>
+      </div>
+
+      <div class="filter-group">
+        <h3>Status</h3>
+        <label><input type="checkbox" class="filter-checkbox" data-group="status" data-value="Active"> Active</label>
+        <label><input type="checkbox" class="filter-checkbox" data-group="status" data-value="Recruiting"> Recruiting</label>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+      <h1 class="slogan">Discover Your Community</h1>
+      <p class="slogan-sub">Explore Student Clubs at SIT</p>
+
+      <button class="mobile-filter-toggle" id="mobileFilterToggle">&#x2630; Show Filters</button>
+
+      <div class="club-grid" id="clubGrid"></div>
+    </main>
+
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 SIT Club Hub &mdash; Shibaura Institute of Technology &bull; <a href="#">Privacy Policy</a> &bull; <a href="#">Contact</a></p>
+  </footer>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
