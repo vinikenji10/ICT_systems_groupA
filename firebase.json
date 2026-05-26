@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public",
+    "source": "sit-club-hub",
     "ignore": [
       "firebase.json",
       "**/.*",
