@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm install && npm run build
+      - run: npm ci && npm run build
         working-directory: ./sit-club-hub
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
