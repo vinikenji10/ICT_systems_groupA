@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { CampusEvent } from '@/app/types';
 
 export default function CampusEvents() {
   const router = useRouter();
+  const { t, lang } = useTranslation();
   const [events, setEvents] = useState<CampusEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,25 +65,25 @@ export default function CampusEvents() {
   }, []);
 
   if (loading) {
-    return <div className="text-center py-20 text-slate-500">Loading campus events...</div>;
+    return <div className="text-center py-20 text-slate-500">{t('events.loading')}</div>;
   }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <section className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-        <h1 className="text-3xl font-bold text-dark mb-2">Campus Events</h1>
-        <p className="text-slate-600">Discover upcoming practices, meetings, and activities across all SIT clubs.</p>
+        <h1 className="text-3xl font-bold text-dark mb-2">{t('events.title')}</h1>
+        <p className="text-slate-600">{t('events.subtitle')}</p>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.length === 0 ? (
           <div className="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
-            <p className="text-slate-500 font-medium">No upcoming events scheduled right now.</p>
-            <p className="text-sm text-slate-400 mt-1">Check back later!</p>
+            <p className="text-slate-500 font-medium">{t('events.noEvents')}</p>
+            <p className="text-sm text-slate-400 mt-1">{t('events.checkBack')}</p>
           </div>
         ) : (
           events.map((event) => {
-            const dateString = event.startTime.toLocaleDateString('en-US', { 
+            const dateString = event.startTime.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', { 
               month: 'short', day: 'numeric', year: 'numeric' 
             });
             const timeString = `${event.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
@@ -96,8 +98,10 @@ export default function CampusEvents() {
                 </div>
                 
                 <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-bold text-xl text-slate-900 mb-1">{event.title_en}</h3>
-                  <p className="text-sm text-slate-500 mb-4">{event.title_ja}</p>
+                  <h3 className="font-bold text-xl text-slate-900 mb-1">{lang === 'ja' && event.title_ja ? event.title_ja : event.title_en}</h3>
+                  {lang === 'en' && event.title_ja && (
+                    <p className="text-sm text-slate-500 mb-4">{event.title_ja}</p>
+                  )}
                   
                   <div className="space-y-2 mt-auto mb-6">
                     <div className="flex items-center text-sm text-slate-600">
@@ -107,7 +111,7 @@ export default function CampusEvents() {
                     {/* Renderização em Inglês por predefinição nesta página pública */}
                     <div className="flex items-center text-sm text-slate-600">
                       <span className="w-5 font-bold">📍</span>
-                      <span>{event.location_en}</span>
+                      <span>{lang === 'ja' && event.location_ja ? event.location_ja : event.location_en}</span>
                     </div>
                     <div className="flex items-center text-sm text-slate-600">
                       <span className="w-5 font-bold">🏢</span>
@@ -121,7 +125,7 @@ export default function CampusEvents() {
                     onClick={() => router.push(`/clubs/${event.clubId}`)}
                     className="w-full bg-slate-100 hover:bg-slate-200 text-dark font-semibold py-2.5 rounded-lg transition-colors mt-auto text-sm"
                   >
-                    View Club Details
+                    {t('events.viewClub')}
                   </button>
                 </div>
               </div>

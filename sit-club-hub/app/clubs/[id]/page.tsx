@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useLanguage } from '@/app/contexts/LanguageContext';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club } from '@/app/types';
 
 export default function ClubDetails() {
@@ -16,8 +18,8 @@ export default function ClubDetails() {
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Estado local temporário para a tabela de detalhes bilingue
-  const [displayLang, setDisplayLang] = useState<'en' | 'ja'>('en');
+  const { lang: displayLang, setLang: setDisplayLang } = useLanguage();
+  const { t, tt } = useTranslation();
 
   // Application states
   const [hasApplied, setHasApplied] = useState(false);
@@ -99,7 +101,7 @@ export default function ClubDetails() {
   };
 
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-500">Loading club details...</div>;
+    return <div className="text-center py-20 text-slate-500">{t('club.loading')}</div>;
   }
 
   if (!club) return null;
@@ -116,7 +118,7 @@ export default function ClubDetails() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-slate-400 font-medium">Banner Image Placeholder</span>
+            <span className="text-slate-400 font-medium">{t('club.bannerPlaceholder')}</span>
           )}
         </div>
         
@@ -126,8 +128,10 @@ export default function ClubDetails() {
               <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-md mb-3 inline-block">
                 {club.category}
               </span>
-              <h1 className="text-3xl font-bold text-slate-900 mb-1">{club.name_en}</h1>
-              <h2 className="text-lg text-slate-500 font-medium">{club.name_ja}</h2>
+              <h1 className="text-3xl font-bold text-slate-900 mb-1">{displayLang === 'ja' && club.name_ja ? club.name_ja : club.name_en}</h1>
+              {displayLang === 'en' && club.name_ja && (
+                <h2 className="text-lg text-slate-500 font-medium">{club.name_ja}</h2>
+              )}
             </div>
 
             <div className="text-right">
@@ -137,11 +141,11 @@ export default function ClubDetails() {
                   disabled={isApplying}
                   className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
                 >
-                  {isApplying ? 'Sending...' : 'Join Club (Apply)'}
+                  {isApplying ? t('club.sending') : t('club.joinClub')}
                 </button>
               ) : (
                 <div className="inline-block border border-slate-200 bg-slate-50 px-6 py-3 rounded-lg text-left">
-                  <p className="text-sm text-slate-500 mb-1">Application Status</p>
+                  <p className="text-sm text-slate-500 mb-1">{t('club.applicationStatus')}</p>
                   <p className={`font-bold capitalize
                     ${applicationStatus === 'pending' ? 'text-amber-600' : 
                       applicationStatus === 'approved' ? 'text-green-600' : 'text-red-600'}`}
@@ -156,96 +160,70 @@ export default function ClubDetails() {
           <div className="flex flex-wrap gap-2 mt-6">
             {club.tags?.map((tag, idx) => (
               <span key={idx} className="text-sm font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-md border border-slate-200">
-                #{tag}
+                #{tt(tag)}
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Description Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-bold text-xl text-dark mb-4">About Us</h3>
-          <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-            {club.description_en || "No description provided."}
-          </p>
-        </div>
-        
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-bold text-xl text-dark mb-4">クラブについて</h3>
-          <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-            {club.description_ja || "詳細はありません。"}
-          </p>
-        </div>
+      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+        <h3 className="font-bold text-xl text-dark mb-4">{displayLang === 'en' ? t('club.aboutUs') : t('club.aboutUsJa')}</h3>
+        <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+          {displayLang === 'en'
+            ? (club.description_en || t('club.noDescription'))
+            : (club.description_ja || t('club.noDescriptionJa'))}
+        </p>
       </div>
 
       {/* Structured Information Section - AGORA DINÂMICA COM O IDIOMA */}
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-xl text-dark">Detailed Information</h3>
-          
-          {/* Seletor de Idioma Local */}
-          <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-            <button 
-              onClick={() => setDisplayLang('en')} 
-              className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${displayLang === 'en' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              EN
-            </button>
-            <button 
-              onClick={() => setDisplayLang('ja')} 
-              className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${displayLang === 'ja' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              日本語
-            </button>
-          </div>
-        </div>
+        <h3 className="font-bold text-xl text-dark mb-6">{t('club.detailedInfo')}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 text-sm">
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Activity' : '活動内容'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.activity') : t('club.activityJa')}</span>
             <span className="text-slate-600">{club[`activity_${displayLang}`] || '-'}</span>
           </div>
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Level' : 'レベル'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.level') : t('club.levelJa')}</span>
             <span className="text-slate-600">{club[`level_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule' : '活動日時'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.schedule') : t('club.scheduleJa')}</span>
             <span className="text-slate-600">{club[`schedule_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule Info' : '予定の詳細'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.scheduleInfo') : t('club.scheduleInfoJa')}</span>
             <span className="text-slate-600">{club[`scheduleInfo_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Location' : '活動場所'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.location') : t('club.locationJa')}</span>
             <span className="text-slate-600">{club[`location_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Main Places' : '主な場所'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.mainPlaces') : t('club.mainPlacesJa')}</span>
             <span className="text-slate-600">{club[`mainPlaces_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Equipment' : '必要なもの'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.equipment') : t('club.equipmentJa')}</span>
             <span className="text-slate-600">{club[`equipment_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Membership Fee' : '部費'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.membershipFee') : t('club.membershipFeeJa')}</span>
             <span className="text-slate-600">{club[`membershipFee_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 md:col-span-2 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Payment Info' : '支払いについて'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? t('club.paymentInfo') : t('club.paymentInfoJa')}</span>
             <span className="text-slate-600">{club[`payment_${displayLang}`] || '-'}</span>
           </div>
 

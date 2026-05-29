@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function EditClub() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
   const params = useParams();
   const clubId = params.id as string;
 
@@ -48,6 +50,7 @@ export default function EditClub() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [headerName, setHeaderName] = useState(''); // Keep original name for header
 
   useEffect(() => {
@@ -194,35 +197,64 @@ export default function EditClub() {
     }
   };
 
+  const handleDeleteClub = async () => {
+    if (!confirm("Are you sure you want to delete this club? This action cannot be undone.")) return;
+    if (!confirm("Final warning: All events, applications, and data for this club will be permanently deleted.")) return;
+
+    setDeleting(true);
+    try {
+      const batch = writeBatch(db);
+
+      const clubRef = doc(db, 'clubs', clubId);
+      batch.delete(clubRef);
+
+      const eventsSnap = await getDocs(query(collection(db, 'events'), where('clubId', '==', clubId)));
+      eventsSnap.forEach(d => batch.delete(d.ref));
+
+      const appsSnap = await getDocs(query(collection(db, 'applications'), where('clubId', '==', clubId)));
+      appsSnap.forEach(d => batch.delete(d.ref));
+
+      await batch.commit();
+
+      alert("Club deleted successfully.");
+      router.push('/admin');
+    } catch (error) {
+      console.error("Error deleting club:", error);
+      alert("Failed to delete club. Check console for details.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-500">Loading editor...</div>;
+    return <div className="text-center py-20 text-slate-500">{t('edit.loading')}</div>;
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-primary">Edit: {headerName}</h1>
+        <h1 className="text-3xl font-bold text-primary">{t('edit.title', { name: headerName })}</h1>
         <button 
           onClick={() => ADMIN_UIDS.includes(user?.uid || '') ? router.push('/admin') : router.push('/dashboard')}
           className="text-slate-500 hover:text-dark font-medium"
         >
-          &larr; Back
+          &larr; {t('edit.back')}
         </button>
       </div>
 
       <form onSubmit={handleSave} className="space-y-8">
         
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">Basic Info & Image</h2>
+        <div className="bg-white p-8 rounded-xl shadow-sm space-y-6">
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">{t('edit.basicInfo')}</h2>
           
           {/* Club Name Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Name (English)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.nameEn')}</label>
               <input type="text" required value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Name (Japanese)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.nameJa')}</label>
               <input type="text" required value={nameJa} onChange={(e) => setNameJa(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             </div>
           </div>
@@ -233,30 +265,30 @@ export default function EditClub() {
                 {(imagePreview || logoUrl) ? (
                   <img src={imagePreview || logoUrl} alt="Club Logo" className="h-full w-full object-cover"/>
                 ) : (
-                  <span className="text-slate-400 text-xs">No Logo</span>
+                  <span className="text-slate-400 text-xs">{t('edit.noLogo')}</span>
                 )}
               </div>
             </div>
             <div className="flex-grow">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Logo / Banner</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.logoLabel')}</label>
               <input type="file" accept="image/*" onChange={handleImageChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Description (English)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.descriptionEn')}</label>
               <textarea rows={4} value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Description (Japanese)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.descriptionJa')}</label>
               <textarea rows={4} value={descriptionJa} onChange={(e) => setDescriptionJa(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">Detailed Information (Bilingual)</h2>
+        <div className="bg-white p-8 rounded-xl shadow-sm space-y-6">
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">{t('edit.detailedInfo')}</h2>
           
           {/* Helper function to render bilingual rows cleanly */}
           {[
@@ -283,17 +315,30 @@ export default function EditClub() {
           ))}
         </div>
 
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2 mb-6">Private Settings</h2>
+        <div className="bg-white p-8 rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2 mb-6">{t('edit.privateSettings')}</h2>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Official LINE Group Link (Private)</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('edit.lineLink')}</label>
             <input type="url" value={lineLink} onChange={(e) => setLineLink(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://line.me/R/ti/g/..." />
           </div>
         </div>
 
         <div className="pt-2 pb-10">
           <button type="submit" disabled={saving} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-4 px-4 rounded-xl transition-colors flex justify-center items-center text-lg shadow-sm">
-            {saving ? 'Saving...' : 'Save All Changes'}
+            {saving ? t('edit.saving') : t('edit.save')}
+          </button>
+        </div>
+
+        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 space-y-4">
+          <h2 className="text-xl font-bold text-red-800">Danger Zone</h2>
+          <p className="text-sm text-red-700">Permanently delete this club and all associated events, applications, and data. This cannot be undone.</p>
+          <button
+            type="button"
+            onClick={handleDeleteClub}
+            disabled={deleting}
+            className="bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+          >
+            {deleting ? 'Deleting...' : 'Delete Club'}
           </button>
         </div>
 

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "ict-systems-project-a"
-  }
+    "default": "ict-systems-project-a",
+    "ict": "ict-systems-project-a"
+  },
+  "targets": {},
+  "etags": {}
 }
