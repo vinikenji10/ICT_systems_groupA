@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
+import type { TranslationKey } from '@/app/contexts/translations';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function EditClub() {
@@ -296,23 +297,23 @@ export default function EditClub() {
           
           {/* Helper function to render bilingual rows cleanly */}
           {[
-            { label: 'Activity', stateEn: activityEn, setEn: setActivityEn, stateJa: activityJa, setJa: setActivityJa },
-            { label: 'Level', stateEn: levelEn, setEn: setLevelEn, stateJa: levelJa, setJa: setLevelJa },
-            { label: 'Schedule', stateEn: scheduleEn, setEn: setScheduleEn, stateJa: scheduleJa, setJa: setScheduleJa },
-            { label: 'Schedule Info', stateEn: scheduleInfoEn, setEn: setScheduleInfoEn, stateJa: scheduleInfoJa, setJa: setScheduleInfoJa },
-            { label: 'Location', stateEn: locationEn, setEn: setLocationEn, stateJa: locationJa, setJa: setLocationJa },
-            { label: 'Main Places', stateEn: mainPlacesEn, setEn: setMainPlacesEn, stateJa: mainPlacesJa, setJa: setMainPlacesJa },
-            { label: 'Equipment', stateEn: equipmentEn, setEn: setEquipmentEn, stateJa: equipmentJa, setJa: setEquipmentJa },
-            { label: 'Membership Fee', stateEn: membershipFeeEn, setEn: setMembershipFeeEn, stateJa: membershipFeeJa, setJa: setMembershipFeeJa },
-            { label: 'Payment', stateEn: paymentEn, setEn: setPaymentEn, stateJa: paymentJa, setJa: setPaymentJa },
+            { key: 'edit.activity' as TranslationKey, stateEn: activityEn, setEn: setActivityEn, stateJa: activityJa, setJa: setActivityJa },
+            { key: 'edit.level' as TranslationKey, stateEn: levelEn, setEn: setLevelEn, stateJa: levelJa, setJa: setLevelJa },
+            { key: 'edit.schedule' as TranslationKey, stateEn: scheduleEn, setEn: setScheduleEn, stateJa: scheduleJa, setJa: setScheduleJa },
+            { key: 'edit.scheduleInfo' as TranslationKey, stateEn: scheduleInfoEn, setEn: setScheduleInfoEn, stateJa: scheduleInfoJa, setJa: setScheduleInfoJa },
+            { key: 'edit.location' as TranslationKey, stateEn: locationEn, setEn: setLocationEn, stateJa: locationJa, setJa: setLocationJa },
+            { key: 'edit.mainPlaces' as TranslationKey, stateEn: mainPlacesEn, setEn: setMainPlacesEn, stateJa: mainPlacesJa, setJa: setMainPlacesJa },
+            { key: 'edit.equipment' as TranslationKey, stateEn: equipmentEn, setEn: setEquipmentEn, stateJa: equipmentJa, setJa: setEquipmentJa },
+            { key: 'edit.membershipFee' as TranslationKey, stateEn: membershipFeeEn, setEn: setMembershipFeeEn, stateJa: membershipFeeJa, setJa: setMembershipFeeJa },
+            { key: 'edit.payment' as TranslationKey, stateEn: paymentEn, setEn: setPaymentEn, stateJa: paymentJa, setJa: setPaymentJa },
           ].map((field, idx) => (
             <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-50 last:border-0">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{field.label} (EN)</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t(field.key)} (EN)</label>
                 <input type="text" value={field.stateEn} onChange={(e) => field.setEn(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{field.label} (JA)</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t(field.key)} (JA)</label>
                 <input type="text" value={field.stateJa} onChange={(e) => field.setJa(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
               </div>
             </div>
