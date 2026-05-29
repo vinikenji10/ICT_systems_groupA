@@ -18,7 +18,7 @@ export default function ClubDetails() {
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const { lang: displayLang, setLang: setDisplayLang } = useLanguage();
+  const { lang: displayLang } = useLanguage();
   const { t, tt } = useTranslation();
 
   // Application states

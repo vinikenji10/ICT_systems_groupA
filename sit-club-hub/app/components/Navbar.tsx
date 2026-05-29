@@ -6,7 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../contexts/useTranslation';
 
 export default function Navbar() {
-  const { user, userRole, loginWithGoogle, logout } = useAuth();
+  const { user, userRole, logout } = useAuth();
   const { lang, toggleLang } = useLanguage();
   const { t } = useTranslation();
 
@@ -45,12 +45,12 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-<button
-  onClick={toggleLang}
-  className="text-sm font-medium text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
->
-  {lang === 'en' ? '日本語' : 'EN'}
-</button>
+            <button
+              onClick={toggleLang}
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
+            >
+              {lang === 'en' ? '日本語' : 'EN'}
+            </button>
             
             {user ? (
               <div className="flex items-center gap-4">

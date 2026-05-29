@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -198,6 +198,10 @@ export default function EditClub() {
   };
 
   const handleDeleteClub = async () => {
+    if (!ADMIN_UIDS.includes(user?.uid || '')) {
+      alert("You are not authorized to delete this club.");
+      return;
+    }
     if (!confirm("Are you sure you want to delete this club? This action cannot be undone.")) return;
     if (!confirm("Final warning: All events, applications, and data for this club will be permanently deleted.")) return;
 
@@ -329,18 +333,20 @@ export default function EditClub() {
           </button>
         </div>
 
-        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 space-y-4">
-          <h2 className="text-xl font-bold text-red-800">Danger Zone</h2>
-          <p className="text-sm text-red-700">Permanently delete this club and all associated events, applications, and data. This cannot be undone.</p>
-          <button
-            type="button"
-            onClick={handleDeleteClub}
-            disabled={deleting}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
-          >
-            {deleting ? 'Deleting...' : 'Delete Club'}
-          </button>
-        </div>
+        {ADMIN_UIDS.includes(user?.uid || '') && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 space-y-4">
+            <h2 className="text-xl font-bold text-red-800">Danger Zone</h2>
+            <p className="text-sm text-red-700">Permanently delete this club and all associated events, applications, and data. This cannot be undone.</p>
+            <button
+              type="button"
+              onClick={handleDeleteClub}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+            >
+              {deleting ? 'Deleting...' : 'Delete Club'}
+            </button>
+          </div>
+        )}
 
       </form>
     </div>
