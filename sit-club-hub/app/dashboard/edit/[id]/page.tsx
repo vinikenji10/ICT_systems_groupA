@@ -6,12 +6,17 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function EditClub() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const clubId = params.id as string;
+
+  // Club Name states
+  const [nameEn, setNameEn] = useState('');
+  const [nameJa, setNameJa] = useState('');
 
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionJa, setDescriptionJa] = useState('');
@@ -43,12 +48,13 @@ export default function EditClub() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [clubName, setClubName] = useState('');
+  const [headerName, setHeaderName] = useState(''); // Keep original name for header
 
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user || userRole !== 'leader') {
+    // Allow access if user is leader OR an admin
+    if (!user || (userRole !== 'leader' && !ADMIN_UIDS.includes(user.uid))) {
       router.push('/');
       return;
     }
@@ -61,13 +67,16 @@ export default function EditClub() {
         if (clubSnap.exists()) {
           const data = clubSnap.data();
           
-          if (!data.leaderIds?.includes(user.uid)) {
+          // Block ONLY if user is not a leader AND not an admin
+          if (!data.leaderIds?.includes(user.uid) && !ADMIN_UIDS.includes(user.uid)) {
             alert("You are not authorized to edit this club.");
             router.push('/dashboard');
             return;
           }
 
-          setClubName(data.name_en);
+          setHeaderName(data.name_en || 'Club');
+          setNameEn(data.name_en || '');
+          setNameJa(data.name_ja || '');
           setDescriptionEn(data.description_en || '');
           setDescriptionJa(data.description_ja || '');
           setLogoUrl(data.logoUrl || '');
@@ -125,6 +134,7 @@ export default function EditClub() {
     try {
       let finalLogoUrl = logoUrl;
 
+      // Handle image upload if a new one was selected
       if (imageFile) {
         const fileExtension = imageFile.name.split('.').pop();
         const storageRef = ref(storage, `clubs/${clubId}/logo_${Date.now()}.${fileExtension}`);
@@ -135,6 +145,8 @@ export default function EditClub() {
 
       const clubRef = doc(db, 'clubs', clubId);
       await updateDoc(clubRef, {
+        name_en: nameEn,     // Save updated English Name
+        name_ja: nameJa,     // Save updated Japanese Name
         description_en: descriptionEn,
         description_ja: descriptionJa,
         logoUrl: finalLogoUrl,
@@ -168,7 +180,12 @@ export default function EditClub() {
       });
 
       alert("Club information saved successfully!");
-      router.push('/dashboard');
+      // Redirect Admins back to Admin panel, Leaders to Dashboard
+      if (ADMIN_UIDS.includes(user?.uid || '')) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
       console.error("Error saving club data:", error);
       alert("Failed to save. Please try again.");
@@ -184,12 +201,12 @@ export default function EditClub() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-800">Edit: {clubName}</h1>
+        <h1 className="text-3xl font-bold text-slate-800">Edit: {headerName}</h1>
         <button 
-          onClick={() => router.push('/dashboard')}
+          onClick={() => ADMIN_UIDS.includes(user?.uid || '') ? router.push('/admin') : router.push('/dashboard')}
           className="text-slate-500 hover:text-slate-800 font-medium"
         >
-          &larr; Back to Dashboard
+          &larr; Back
         </button>
       </div>
 
@@ -198,6 +215,18 @@ export default function EditClub() {
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
           <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Basic Info & Image</h2>
           
+          {/* Club Name Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Name (English)</label>
+              <input type="text" required value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Name (Japanese)</label>
+              <input type="text" required value={nameJa} onChange={(e) => setNameJa(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+            </div>
+          </div>
+
           <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
             <div className="shrink-0">
               <div className="h-24 w-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-slate-200 flex items-center justify-center">

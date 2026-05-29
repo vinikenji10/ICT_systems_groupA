@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Secure Firebase Config
 /app/firebase/config.ts
+
+# admin UIDS
+/app/utils/constants.ts

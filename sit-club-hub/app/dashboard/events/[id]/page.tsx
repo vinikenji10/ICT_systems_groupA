@@ -6,18 +6,20 @@ import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, Time
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { ClubEvent } from '@/app/types';
+import { ADMIN_UIDS } from '@/app/utils/constants'; // Importing the master key array
 
 export default function ManageEvents() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const clubId = params.id as string; // Fix: was clubId in earlier code, should match params.id based on folder structure
+  const clubId = params.id as string; 
   
   const [events, setEvents] = useState<ClubEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [clubName, setClubName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Form states for creating a new event
   const [titleEn, setTitleEn] = useState('');
   const [titleJa, setTitleJa] = useState('');
   const [descriptionEn, setDescriptionEn] = useState('');
@@ -30,7 +32,8 @@ export default function ManageEvents() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user || userRole !== 'leader') {
+    // Security block: Allow access if the user is a leader OR an admin
+    if (!user || (userRole !== 'leader' && !ADMIN_UIDS.includes(user.uid))) {
       router.push('/');
       return;
     }
@@ -40,7 +43,9 @@ export default function ManageEvents() {
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
         
-        if (!clubSnap.exists() || !clubSnap.data().leaderIds?.includes(user.uid)) {
+        // Check if the user is authorized to manage this specific club
+        // Block ONLY if the user is neither a leader of this club NOR an admin
+        if (!clubSnap.exists() || (!clubSnap.data().leaderIds?.includes(user.uid) && !ADMIN_UIDS.includes(user.uid))) {
           alert("You are not authorized to manage events for this club.");
           router.push('/dashboard');
           return;
@@ -48,6 +53,7 @@ export default function ManageEvents() {
         
         setClubName(clubSnap.data().name_en);
 
+        // Fetch existing events for this club
         const eventsRef = collection(db, 'events');
         const q = query(eventsRef, where('clubId', '==', clubId));
         const querySnapshot = await getDocs(q);
@@ -62,6 +68,7 @@ export default function ManageEvents() {
           } as ClubEvent;
         });
 
+        // Sort events chronologically (closest dates first)
         eventsData.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
         setEvents(eventsData);
       } catch (error) {
@@ -94,8 +101,10 @@ export default function ManageEvents() {
 
       const docRef = await addDoc(collection(db, 'events'), newEvent);
       
+      // Update local state to show the new event immediately
       setEvents([...events, { ...newEvent, id: docRef.id, startTime: new Date(startTime), endTime: new Date(endTime) }].sort((a, b) => a.startTime.getTime() - b.startTime.getTime()));
       
+      // Reset form fields
       setTitleEn(''); setTitleJa(''); setDescriptionEn(''); setDescriptionJa('');
       setStartTime(''); setEndTime(''); setLocationEn(''); setLocationJa('');
       
@@ -137,6 +146,7 @@ export default function ManageEvents() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
+        {/* Event Creation Form */}
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
           <h2 className="font-bold text-xl text-slate-800 mb-4">Create Event</h2>
           <form onSubmit={handleAddEvent} className="space-y-4">
@@ -166,12 +176,13 @@ export default function ManageEvents() {
                 <input type="datetime-local" required value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
               </div>
             </div>
-            <button type="submit" disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-4 disabled:bg-blue-300">
+            <button type="submit" disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-4 disabled:bg-blue-300 transition-colors">
               {isSaving ? 'Saving...' : 'Add Event'}
             </button>
           </form>
         </div>
 
+        {/* Scheduled Events List */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="font-bold text-xl text-slate-800 mb-4">Upcoming Schedule</h2>
           {events.length === 0 ? (
