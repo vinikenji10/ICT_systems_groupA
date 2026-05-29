@@ -4,27 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
-
-
-interface Club {
-  id: string;
-  name_en: string;
-  name_ja: string;
-  category: string;
-  description_en: string;
-  description_ja: string;
-  tags: string[];
-  logoUrl?: string;
-  activity?: string;
-  level?: string;
-  schedule?: string;
-  scheduleInfo?: string;
-  location?: string;
-  mainPlaces?: string;
-  equipment?: string;
-  membershipFee?: string;
-  payment?: string;
-}
+import { Club } from "@/app/types";
 
 export default function DiscoveryPage() {
   const router = useRouter();
@@ -32,13 +12,11 @@ export default function DiscoveryPage() {
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Estados de busca e filtragem
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = ["All", "Engineering", "Esports", "Sports", "Cultural", "Design"];
 
-  // Carrega os clubes diretamente do Firestore (sem função de popular)
   useEffect(() => {
     const fetchClubs = async () => {
       try {
@@ -60,11 +38,9 @@ export default function DiscoveryPage() {
     fetchClubs();
   }, []);
 
-  // Lógica de filtragem por barra de pesquisa e categorias laterais
   useEffect(() => {
     let result = clubs;
 
-    // Filtro por Categoria
     if (selectedCategory !== "All") {
       result = result.filter((club) => 
         club.category?.toLowerCase() === selectedCategory.toLowerCase() || 
@@ -72,7 +48,6 @@ export default function DiscoveryPage() {
       );
     }
 
-    // Filtro por Texto (Nome, Nome em Japonês ou Tags)
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -98,7 +73,6 @@ export default function DiscoveryPage() {
     <div className="min-h-screen bg-[#0d4f37] p-6 md:p-12">
       <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* Banner de Pesquisa Principal */}
         <div className="bg-white rounded-2xl p-8 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-extrabold text-slate-900">Discover Hidden Communities</h1>
@@ -115,10 +89,8 @@ export default function DiscoveryPage() {
           </div>
         </div>
 
-        {/* Layout Principal: Categorias + Grid de Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
-          {/* Menu Lateral de Categorias */}
           <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">Categories</h3>
             <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
@@ -138,7 +110,6 @@ export default function DiscoveryPage() {
             </div>
           </div>
 
-          {/* Grid de Clubes */}
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredClubs.length > 0 ? (
               filteredClubs.map((club) => (
@@ -146,7 +117,6 @@ export default function DiscoveryPage() {
                   key={club.id}
                   className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-slate-100 group transition-all hover:shadow-xl hover:-translate-y-1"
                 >
-                  {/* Seção da Imagem / Logo com renderização condicional dinâmica */}
                   <div className="h-48 w-full bg-slate-100 relative overflow-hidden shrink-0 border-b border-slate-100">
                     {club.logoUrl ? (
                       <img
@@ -161,9 +131,7 @@ export default function DiscoveryPage() {
                     )}
                   </div>
 
-                  {/* Conteúdo do Card */}
                   <div className="p-6 flex flex-col flex-grow space-y-4">
-                    {/* Tags do Clube */}
                     <div className="flex flex-wrap gap-1.5">
                       {club.tags?.map((tag, idx) => (
                         <span
@@ -179,7 +147,6 @@ export default function DiscoveryPage() {
                       ))}
                     </div>
 
-                    {/* Títulos (EN / JA) */}
                     <div className="space-y-1">
                       <h2 className="text-xl font-bold text-slate-900 leading-snug">{club.name_en}</h2>
                       {club.name_ja && (
@@ -187,12 +154,10 @@ export default function DiscoveryPage() {
                       )}
                     </div>
 
-                    {/* Descrição */}
                     <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 flex-grow">
                       {club.description_en || "No description provided yet."}
                     </p>
 
-                    {/* Botão de Ação */}
                     <button
                       onClick={() => router.push(`/clubs/${club.id}`)}
                       className="w-full bg-[#121824] hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm mt-auto"
@@ -208,7 +173,6 @@ export default function DiscoveryPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>

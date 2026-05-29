@@ -13,28 +13,34 @@ export default function EditClub() {
   const params = useParams();
   const clubId = params.id as string;
 
-  // Existing Form states
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionJa, setDescriptionJa] = useState('');
   const [lineLink, setLineLink] = useState('');
   
-  // New Structured Information states
-  const [activity, setActivity] = useState('');
-  const [level, setLevel] = useState('');
-  const [schedule, setSchedule] = useState('');
-  const [scheduleInfo, setScheduleInfo] = useState('');
-  const [location, setLocation] = useState('');
-  const [mainPlaces, setMainPlaces] = useState('');
-  const [equipment, setEquipment] = useState('');
-  const [membershipFee, setMembershipFee] = useState('');
-  const [payment, setPayment] = useState('');
+  // Structured Information states (Bilingual)
+  const [activityEn, setActivityEn] = useState('');
+  const [activityJa, setActivityJa] = useState('');
+  const [levelEn, setLevelEn] = useState('');
+  const [levelJa, setLevelJa] = useState('');
+  const [scheduleEn, setScheduleEn] = useState('');
+  const [scheduleJa, setScheduleJa] = useState('');
+  const [scheduleInfoEn, setScheduleInfoEn] = useState('');
+  const [scheduleInfoJa, setScheduleInfoJa] = useState('');
+  const [locationEn, setLocationEn] = useState('');
+  const [locationJa, setLocationJa] = useState('');
+  const [mainPlacesEn, setMainPlacesEn] = useState('');
+  const [mainPlacesJa, setMainPlacesJa] = useState('');
+  const [equipmentEn, setEquipmentEn] = useState('');
+  const [equipmentJa, setEquipmentJa] = useState('');
+  const [membershipFeeEn, setMembershipFeeEn] = useState('');
+  const [membershipFeeJa, setMembershipFeeJa] = useState('');
+  const [paymentEn, setPaymentEn] = useState('');
+  const [paymentJa, setPaymentJa] = useState('');
 
-  // Image states
   const [logoUrl, setLogoUrl] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // UI states
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [clubName, setClubName] = useState('');
@@ -66,16 +72,24 @@ export default function EditClub() {
           setDescriptionJa(data.description_ja || '');
           setLogoUrl(data.logoUrl || '');
           
-          // Populate new structured fields
-          setActivity(data.activity || '');
-          setLevel(data.level || '');
-          setSchedule(data.schedule || '');
-          setScheduleInfo(data.scheduleInfo || '');
-          setLocation(data.location || '');
-          setMainPlaces(data.mainPlaces || '');
-          setEquipment(data.equipment || '');
-          setMembershipFee(data.membershipFee || '');
-          setPayment(data.payment || '');
+          setActivityEn(data.activity_en || '');
+          setActivityJa(data.activity_ja || '');
+          setLevelEn(data.level_en || '');
+          setLevelJa(data.level_ja || '');
+          setScheduleEn(data.schedule_en || '');
+          setScheduleJa(data.schedule_ja || '');
+          setScheduleInfoEn(data.scheduleInfo_en || '');
+          setScheduleInfoJa(data.scheduleInfo_ja || '');
+          setLocationEn(data.location_en || '');
+          setLocationJa(data.location_ja || '');
+          setMainPlacesEn(data.mainPlaces_en || '');
+          setMainPlacesJa(data.mainPlaces_ja || '');
+          setEquipmentEn(data.equipment_en || '');
+          setEquipmentJa(data.equipment_ja || '');
+          setMembershipFeeEn(data.membershipFee_en || '');
+          setMembershipFeeJa(data.membershipFee_ja || '');
+          setPaymentEn(data.payment_en || '');
+          setPaymentJa(data.payment_ja || '');
 
           const linkRef = doc(db, 'clubs', clubId, 'privateData', 'links');
           const linkSnap = await getDoc(linkRef);
@@ -119,29 +133,36 @@ export default function EditClub() {
         finalLogoUrl = await getDownloadURL(snapshot.ref);
       }
 
-      // Update public club data (including new structured fields)
       const clubRef = doc(db, 'clubs', clubId);
       await updateDoc(clubRef, {
         description_en: descriptionEn,
         description_ja: descriptionJa,
         logoUrl: finalLogoUrl,
-        activity,
-        level,
-        schedule,
-        scheduleInfo,
-        location,
-        mainPlaces,
-        equipment,
-        membershipFee,
-        payment,
+        activity_en: activityEn,
+        activity_ja: activityJa,
+        level_en: levelEn,
+        level_ja: levelJa,
+        schedule_en: scheduleEn,
+        schedule_ja: scheduleJa,
+        scheduleInfo_en: scheduleInfoEn,
+        scheduleInfo_ja: scheduleInfoJa,
+        location_en: locationEn,
+        location_ja: locationJa,
+        mainPlaces_en: mainPlacesEn,
+        mainPlaces_ja: mainPlacesJa,
+        equipment_en: equipmentEn,
+        equipment_ja: equipmentJa,
+        membershipFee_en: membershipFeeEn,
+        membershipFee_ja: membershipFeeJa,
+        payment_en: paymentEn,
+        payment_ja: paymentJa,
         updatedAt: new Date()
       });
 
-      // Update private LINE link
       const linkRef = doc(db, 'clubs', clubId, 'privateData', 'links');
       await updateDoc(linkRef, {
         lineGroupLink: lineLink
-      }).catch(async (err) => {
+      }).catch(async () => {
         const { setDoc } = await import('firebase/firestore');
         await setDoc(linkRef, { lineGroupLink: lineLink }, { merge: true });
       });
@@ -161,7 +182,7 @@ export default function EditClub() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-slate-800">Edit: {clubName}</h1>
         <button 
@@ -174,7 +195,6 @@ export default function EditClub() {
 
       <form onSubmit={handleSave} className="space-y-8">
         
-        {/* Basic Info Section */}
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
           <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Basic Info & Image</h2>
           
@@ -182,169 +202,68 @@ export default function EditClub() {
             <div className="shrink-0">
               <div className="h-24 w-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-slate-200 flex items-center justify-center">
                 {(imagePreview || logoUrl) ? (
-                  <img 
-                    src={imagePreview || logoUrl} 
-                    alt="Club Logo" 
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={imagePreview || logoUrl} alt="Club Logo" className="h-full w-full object-cover"/>
                 ) : (
                   <span className="text-slate-400 text-xs">No Logo</span>
                 )}
               </div>
             </div>
             <div className="flex-grow">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Club Logo / Banner
-              </label>
-              <input 
-                type="file" 
-                accept="image/*"
-                onChange={handleImageChange}
-                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors cursor-pointer"
-              />
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Club Logo / Banner</label>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Description (English)</label>
-            <textarea 
-              rows={3}
-              value={descriptionEn}
-              onChange={(e) => setDescriptionEn(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="General overview..."
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Description (Japanese)</label>
-            <textarea 
-              rows={3}
-              value={descriptionJa}
-              onChange={(e) => setDescriptionJa(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="..."
-              required
-            />
-          </div>
-        </div>
-
-        {/* Detailed Information Section */}
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Detailed Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Activity</label>
-              <input 
-                type="text" value={activity} onChange={(e) => setActivity(e.target.value)}
-                placeholder="e.g. International exchange, friendship..."
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Description (English)</label>
+              <textarea rows={4} value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
             </div>
-
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Level</label>
-              <input 
-                type="text" value={level} onChange={(e) => setLevel(e.target.value)}
-                placeholder="e.g. Open to everyone"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Description (Japanese)</label>
+              <textarea rows={4} value={descriptionJa} onChange={(e) => setDescriptionJa(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
             </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Schedule</label>
-              <input 
-                type="text" value={schedule} onChange={(e) => setSchedule(e.target.value)}
-                placeholder="e.g. Varies every month"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Schedule Info</label>
-              <input 
-                type="text" value={scheduleInfo} onChange={(e) => setScheduleInfo(e.target.value)}
-                placeholder="e.g. Posted on Instagram"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Location</label>
-              <input 
-                type="text" value={location} onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Varies depending on activity"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Main Places</label>
-              <input 
-                type="text" value={mainPlaces} onChange={(e) => setMainPlaces(e.target.value)}
-                placeholder="e.g. Asakusa, Omiya..."
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Equipment</label>
-              <input 
-                type="text" value={equipment} onChange={(e) => setEquipment(e.target.value)}
-                placeholder="e.g. Willingness to interact"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Membership Fee</label>
-              <input 
-                type="text" value={membershipFee} onChange={(e) => setMembershipFee(e.target.value)}
-                placeholder="e.g. None"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Payment</label>
-              <input 
-                type="text" value={payment} onChange={(e) => setPayment(e.target.value)}
-                placeholder="e.g. No fixed payment; collected when needed"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-
           </div>
         </div>
 
-        {/* Private Data Section */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
+          <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Detailed Information (Bilingual)</h2>
+          
+          {/* Helper function to render bilingual rows cleanly */}
+          {[
+            { label: 'Activity', stateEn: activityEn, setEn: setActivityEn, stateJa: activityJa, setJa: setActivityJa },
+            { label: 'Level', stateEn: levelEn, setEn: setLevelEn, stateJa: levelJa, setJa: setLevelJa },
+            { label: 'Schedule', stateEn: scheduleEn, setEn: setScheduleEn, stateJa: scheduleJa, setJa: setScheduleJa },
+            { label: 'Schedule Info', stateEn: scheduleInfoEn, setEn: setScheduleInfoEn, stateJa: scheduleInfoJa, setJa: setScheduleInfoJa },
+            { label: 'Location', stateEn: locationEn, setEn: setLocationEn, stateJa: locationJa, setJa: setLocationJa },
+            { label: 'Main Places', stateEn: mainPlacesEn, setEn: setMainPlacesEn, stateJa: mainPlacesJa, setJa: setMainPlacesJa },
+            { label: 'Equipment', stateEn: equipmentEn, setEn: setEquipmentEn, stateJa: equipmentJa, setJa: setEquipmentJa },
+            { label: 'Membership Fee', stateEn: membershipFeeEn, setEn: setMembershipFeeEn, stateJa: membershipFeeJa, setJa: setMembershipFeeJa },
+            { label: 'Payment', stateEn: paymentEn, setEn: setPaymentEn, stateJa: paymentJa, setJa: setPaymentJa },
+          ].map((field, idx) => (
+            <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-50 last:border-0">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{field.label} (EN)</label>
+                <input type="text" value={field.stateEn} onChange={(e) => field.setEn(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{field.label} (JA)</label>
+                <input type="text" value={field.stateJa} onChange={(e) => field.setJa(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
           <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2 mb-6">Private Settings</h2>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Official LINE Group Link (Private)
-            </label>
-            <input 
-              type="url"
-              value={lineLink}
-              onChange={(e) => setLineLink(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="https://line.me/R/ti/g/..."
-            />
-            <p className="text-xs text-slate-500 mt-2">
-              This link is hidden from the public. Only students who apply and are <strong>approved</strong> will see it.
-            </p>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Official LINE Group Link (Private)</label>
+            <input type="url" value={lineLink} onChange={(e) => setLineLink(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://line.me/R/ti/g/..." />
           </div>
         </div>
 
         <div className="pt-2 pb-10">
-          <button 
-            type="submit" 
-            disabled={saving}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-4 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-lg shadow-sm"
-          >
+          <button type="submit" disabled={saving} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-4 px-4 rounded-xl transition-colors flex justify-center items-center text-lg shadow-sm">
             {saving ? 'Saving...' : 'Save All Changes'}
           </button>
         </div>

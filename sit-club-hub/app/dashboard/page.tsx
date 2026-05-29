@@ -3,36 +3,24 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config'; //
+import { db } from '../firebase/config';
 import { useAuth } from '../hooks/useAuth';
-
-// Interface for the Club data model
-interface Club {
-  id: string;
-  name_en: string;
-  name_ja: string;
-  category: string;
-  status: string;
-}
+import { Club } from '@/app/types';
 
 export default function LeaderDashboard() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
-  
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loadingClubs, setLoadingClubs] = useState(true);
 
   useEffect(() => {
-    // If authentication is still loading, do nothing
     if (authLoading) return;
 
-    // Redirect to home if user is not logged in or is not a leader
     if (!user || userRole !== 'leader') {
       router.push('/');
       return;
     }
 
-    // Fetch only the clubs where the current user is a leader
     const fetchMyClubs = async () => {
       try {
         const clubsRef = collection(db, 'clubs');
@@ -55,7 +43,6 @@ export default function LeaderDashboard() {
     fetchMyClubs();
   }, [user, userRole, authLoading, router]);
 
-  // Show a loading state while checking authentication
   if (authLoading || (user && userRole === 'leader' && loadingClubs)) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -64,7 +51,6 @@ export default function LeaderDashboard() {
     );
   }
 
-  // Prevent rendering if not authorized (acts as a fallback before redirect)
   if (!user || userRole !== 'leader') {
     return null; 
   }
@@ -104,10 +90,16 @@ export default function LeaderDashboard() {
                   Edit Profile
                 </button>
                 <button
+                  onClick={() => router.push(`/dashboard/events/${club.id}`)}
+                  className="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
+                  Events
+                </button>
+                <button
                   onClick={() => router.push(`/dashboard/applications/${club.id}`)}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
                 >
-                  Manage Apps
+                  Apps
                 </button>
               </div>
             </div>

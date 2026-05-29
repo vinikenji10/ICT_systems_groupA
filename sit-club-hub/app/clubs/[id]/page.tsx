@@ -5,27 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
-
-// Interface for the Club data updated with new structured fields
-interface Club {
-  id: string;
-  name_en: string;
-  name_ja: string;
-  category: string;
-  description_en: string;
-  description_ja: string;
-  tags: string[];
-  logoUrl?: string;
-  activity?: string;
-  level?: string;
-  schedule?: string;
-  scheduleInfo?: string;
-  location?: string;
-  mainPlaces?: string;
-  equipment?: string;
-  membershipFee?: string;
-  payment?: string;
-}
+import { Club } from '@/app/types';
 
 export default function ClubDetails() {
   const { user, loading: authLoading } = useAuth();
@@ -36,12 +16,14 @@ export default function ClubDetails() {
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   
+  // Estado local temporário para a tabela de detalhes bilingue
+  const [displayLang, setDisplayLang] = useState<'en' | 'ja'>('en');
+
   // Application states
   const [hasApplied, setHasApplied] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
 
-  // Fetch Club Details
   useEffect(() => {
     const fetchClub = async () => {
       try {
@@ -64,7 +46,6 @@ export default function ClubDetails() {
     fetchClub();
   }, [clubId, router]);
 
-  // Check if the current user has already applied
   useEffect(() => {
     if (!user || authLoading) return;
 
@@ -90,15 +71,12 @@ export default function ClubDetails() {
     checkApplicationStatus();
   }, [user, authLoading, clubId]);
 
-  // Handle the "One-Click Application"
   const handleApply = async () => {
     if (!user) {
       alert("Please sign in to apply to this club.");
       return;
     }
-
     setIsApplying(true);
-
     try {
       const appsRef = collection(db, 'applications');
       await addDoc(appsRef, {
@@ -130,8 +108,6 @@ export default function ClubDetails() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header Section */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        
-        {/* Image Section */}
         <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
           {club.logoUrl ? (
             <img
@@ -154,7 +130,6 @@ export default function ClubDetails() {
               <h2 className="text-lg text-slate-500 font-medium">{club.name_ja}</h2>
             </div>
 
-            {/* Application Button Area */}
             <div className="text-right">
               {!hasApplied ? (
                 <button 
@@ -178,7 +153,6 @@ export default function ClubDetails() {
             </div>
           </div>
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-2 mt-6">
             {club.tags?.map((tag, idx) => (
               <span key={idx} className="text-sm font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-md border border-slate-200">
@@ -206,60 +180,77 @@ export default function ClubDetails() {
         </div>
       </div>
 
-      {/* Structured Information Section */}
+      {/* Structured Information Section - AGORA DINÂMICA COM O IDIOMA */}
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-        <h3 className="font-bold text-xl text-slate-800 mb-6">Detailed Information</h3>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-xl text-slate-800">Detailed Information</h3>
+          
+          {/* Seletor de Idioma Local */}
+          <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+            <button 
+              onClick={() => setDisplayLang('en')} 
+              className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${displayLang === 'en' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              EN
+            </button>
+            <button 
+              onClick={() => setDisplayLang('ja')} 
+              className={`px-4 py-1.5 text-sm font-bold rounded-md transition-all ${displayLang === 'ja' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              日本語
+            </button>
+          </div>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 text-sm">
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Activity</span>
-            <span className="text-slate-600">{club.activity || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Activity' : '活動内容'}</span>
+            <span className="text-slate-600">{club[`activity_${displayLang}`] || '-'}</span>
           </div>
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Level</span>
-            <span className="text-slate-600">{club.level || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Level' : 'レベル'}</span>
+            <span className="text-slate-600">{club[`level_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Schedule</span>
-            <span className="text-slate-600">{club.schedule || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule' : '活動日時'}</span>
+            <span className="text-slate-600">{club[`schedule_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Schedule Info</span>
-            <span className="text-slate-600">{club.scheduleInfo || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule Info' : '予定の詳細'}</span>
+            <span className="text-slate-600">{club[`scheduleInfo_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Location</span>
-            <span className="text-slate-600">{club.location || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Location' : '活動場所'}</span>
+            <span className="text-slate-600">{club[`location_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Main Places</span>
-            <span className="text-slate-600">{club.mainPlaces || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Main Places' : '主な場所'}</span>
+            <span className="text-slate-600">{club[`mainPlaces_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Equipment</span>
-            <span className="text-slate-600">{club.equipment || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Equipment' : '必要なもの'}</span>
+            <span className="text-slate-600">{club[`equipment_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Membership Fee</span>
-            <span className="text-slate-600">{club.membershipFee || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Membership Fee' : '部費'}</span>
+            <span className="text-slate-600">{club[`membershipFee_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 md:col-span-2 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">Payment Info</span>
-            <span className="text-slate-600">{club.payment || '-'}</span>
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Payment Info' : '支払いについて'}</span>
+            <span className="text-slate-600">{club[`payment_${displayLang}`] || '-'}</span>
           </div>
 
         </div>
       </div>
-
     </div>
   );
 }

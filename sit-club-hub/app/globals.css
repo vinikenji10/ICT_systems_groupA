@@ -1,9 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  /* Fixamos a sua paleta oficial para TODOS os usuários */
-  --background: #0f4e3c; /* Fundo verde escuro */
-  --foreground: #ededed; /* Texto claro padrão para a página */
+  --background: #0f4e3c; 
+  --foreground: #ededed; 
 }
 
 @theme inline {
@@ -19,10 +18,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* BLINDAGEM DOS INPUTS:
-  Como os formulários têm fundo branco (bg-white no Tailwind), 
-  forçamos a fonte das caixas de texto a ser escura para ficar legível.
-*/
 input, 
 textarea, 
 select {
@@ -32,6 +27,6 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-  color: #94a3b8; /* Um tom de cinza perfeito para placeholders */
+  color: #94a3b8; 
   opacity: 1; 
 }

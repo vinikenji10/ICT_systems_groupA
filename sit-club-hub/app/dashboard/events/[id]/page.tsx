@@ -3,47 +3,33 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { db } from '@/app/firebase/config'; // Adjust the path if necessary
+import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
-
-// Interface for the Event data
-interface ClubEvent {
-  id: string;
-  clubId: string;
-  title_en: string;
-  title_ja: string;
-  description_en: string;
-  description_ja: string;
-  startTime: Date;
-  endTime: Date;
-  location: string;
-  isPublic: boolean;
-}
+import { ClubEvent } from '@/app/types';
 
 export default function ManageEvents() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const clubId = params.clubId as string;
-
+  const clubId = params.id as string; // Fix: was clubId in earlier code, should match params.id based on folder structure
+  
   const [events, setEvents] = useState<ClubEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [clubName, setClubName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Form states for a new event
   const [titleEn, setTitleEn] = useState('');
   const [titleJa, setTitleJa] = useState('');
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionJa, setDescriptionJa] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationEn, setLocationEn] = useState('');
+  const [locationJa, setLocationJa] = useState('');
 
   useEffect(() => {
     if (authLoading) return;
 
-    // Block access if not logged in or not a leader
     if (!user || userRole !== 'leader') {
       router.push('/');
       return;
@@ -51,38 +37,33 @@ export default function ManageEvents() {
 
     const fetchEventsAndClub = async () => {
       try {
-        // 1. Verify if the current user is a leader of this club
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
-
+        
         if (!clubSnap.exists() || !clubSnap.data().leaderIds?.includes(user.uid)) {
           alert("You are not authorized to manage events for this club.");
           router.push('/dashboard');
           return;
         }
-
+        
         setClubName(clubSnap.data().name_en);
 
-        // 2. Fetch existing events for this club
         const eventsRef = collection(db, 'events');
         const q = query(eventsRef, where('clubId', '==', clubId));
         const querySnapshot = await getDocs(q);
-
+        
         const eventsData = querySnapshot.docs.map(docSnap => {
           const data = docSnap.data();
           return {
             id: docSnap.id,
             ...data,
-            // Convert Firestore Timestamps back to JavaScript Dates
             startTime: data.startTime.toDate(),
             endTime: data.endTime.toDate(),
           } as ClubEvent;
         });
 
-        // Sort events by start time (newest/upcoming first)
         eventsData.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
         setEvents(eventsData);
-
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -96,7 +77,7 @@ export default function ManageEvents() {
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-
+    
     try {
       const newEvent = {
         clubId,
@@ -106,18 +87,17 @@ export default function ManageEvents() {
         description_ja: descriptionJa,
         startTime: Timestamp.fromDate(new Date(startTime)),
         endTime: Timestamp.fromDate(new Date(endTime)),
-        location,
-        isPublic: true // Defaulting to true for now
+        location_en: locationEn,
+        location_ja: locationJa,
+        isPublic: true
       };
 
       const docRef = await addDoc(collection(db, 'events'), newEvent);
       
-      // Update local UI state
       setEvents([...events, { ...newEvent, id: docRef.id, startTime: new Date(startTime), endTime: new Date(endTime) }].sort((a, b) => a.startTime.getTime() - b.startTime.getTime()));
       
-      // Reset form
       setTitleEn(''); setTitleJa(''); setDescriptionEn(''); setDescriptionJa('');
-      setStartTime(''); setEndTime(''); setLocation('');
+      setStartTime(''); setEndTime(''); setLocationEn(''); setLocationJa('');
       
       alert("Event added successfully!");
     } catch (error) {
@@ -130,7 +110,6 @@ export default function ManageEvents() {
 
   const handleDeleteEvent = async (eventId: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
-
     try {
       await deleteDoc(doc(db, 'events', eventId));
       setEvents(events.filter(e => e.id !== eventId));
@@ -151,32 +130,31 @@ export default function ManageEvents() {
           <h1 className="text-3xl font-bold text-slate-800">Manage Events</h1>
           <p className="text-slate-600 mt-1">Schedule practices and meetings for {clubName}</p>
         </div>
-        <button 
-          onClick={() => router.push('/dashboard')}
-          className="text-slate-500 hover:text-slate-800 font-medium"
-        >
+        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-slate-800 font-medium">
           &larr; Back to Dashboard
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Add New Event Form */}
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
           <h2 className="font-bold text-xl text-slate-800 mb-4">Create Event</h2>
           <form onSubmit={handleAddEvent} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Title (EN)</label>
-              <input type="text" required value={titleEn} onChange={e => setTitleEn(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="e.g., Weekly Practice" />
+              <input type="text" required value={titleEn} onChange={e => setTitleEn(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Title (JA)</label>
-              <input type="text" required value={titleJa} onChange={e => setTitleJa(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="e.g., 毎週の練習" />
-              <p className="text-xs text-slate-400 mt-1">*AI translation will automate this field later.</p>
+              <input type="text" required value={titleJa} onChange={e => setTitleJa(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Location</label>
-              <input type="text" required value={location} onChange={e => setLocation(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="e.g., Omiya Campus Gym" />
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Location (EN)</label>
+              <input type="text" required value={locationEn} onChange={e => setLocationEn(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Location (JA)</label>
+              <input type="text" required value={locationJa} onChange={e => setLocationJa(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -194,7 +172,6 @@ export default function ManageEvents() {
           </form>
         </div>
 
-        {/* List of Events */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="font-bold text-xl text-slate-800 mb-4">Upcoming Schedule</h2>
           {events.length === 0 ? (
@@ -206,22 +183,18 @@ export default function ManageEvents() {
               <div key={event.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">{event.title_en}</h3>
-                  <p className="text-sm text-slate-500">{event.location}</p>
+                  <p className="text-sm text-slate-500">{event.location_en}</p>
                   <p className="text-xs text-slate-400 mt-1 font-medium text-blue-600">
                     {event.startTime.toLocaleString()} - {event.endTime.toLocaleString()}
                   </p>
                 </div>
-                <button 
-                  onClick={() => handleDeleteEvent(event.id)}
-                  className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors"
-                >
+                <button onClick={() => handleDeleteEvent(event.id)} className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors">
                   Delete
                 </button>
               </div>
             ))
           )}
         </div>
-
       </div>
     </div>
   );
