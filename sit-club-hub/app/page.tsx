@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
+import { useTranslation } from "@/app/contexts/useTranslation";
+import type { TranslationKey } from "@/app/contexts/translations";
 import { Club } from "@/app/types";
 
 export default function DiscoveryPage() {
   const router = useRouter();
+  const { t, tt, lang } = useTranslation();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +19,14 @@ export default function DiscoveryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = ["All", "Engineering", "Esports", "Sports", "Cultural", "Design"];
+  const catKey: Record<string, TranslationKey> = {
+    All: 'discovery.catAll',
+    Engineering: 'discovery.catEngineering',
+    Esports: 'discovery.catEsports',
+    Sports: 'discovery.catSports',
+    Cultural: 'discovery.catCultural',
+    Design: 'discovery.catDesign',
+  };
 
   useEffect(() => {
     const fetchClubs = async () => {
@@ -64,7 +75,7 @@ export default function DiscoveryPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0d4f37] flex items-center justify-center text-white text-lg">
-        Loading communities...
+        {t('discovery.loading')}
       </div>
     );
   }
@@ -75,13 +86,13 @@ export default function DiscoveryPage() {
         
         <div className="bg-white rounded-2xl p-8 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-extrabold text-slate-900">Discover Hidden Communities</h1>
-            <p className="text-slate-500 font-medium">Find your passion and join student organizations.</p>
+            <h1 className="text-3xl font-extrabold text-slate-900">{t('discovery.title')}</h1>
+            <p className="text-slate-500 font-medium">{t('discovery.subtitle')}</p>
           </div>
           <div className="w-full md:w-96">
             <input
               type="text"
-              placeholder="Search clubs, sports, tags..."
+              placeholder={t('discovery.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium bg-slate-50 text-slate-800 placeholder-slate-400"
@@ -92,7 +103,7 @@ export default function DiscoveryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
           <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">Categories</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">{t('discovery.categories')}</h3>
             <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
               {categories.map((category) => (
                 <button
@@ -104,7 +115,7 @@ export default function DiscoveryPage() {
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
-                  {category}
+                  {t(catKey[category])}
                 </button>
               ))}
             </div>
@@ -126,7 +137,7 @@ export default function DiscoveryPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-medium">
-                        Image Placeholder
+                        {t('discovery.imagePlaceholder')}
                       </div>
                     )}
                   </div>
@@ -142,34 +153,34 @@ export default function DiscoveryPage() {
                               : "bg-slate-100 text-slate-600"
                           }`}
                         >
-                          {tag}
+                          {tt(tag)}
                         </span>
                       ))}
                     </div>
 
                     <div className="space-y-1">
-                      <h2 className="text-xl font-bold text-slate-900 leading-snug">{club.name_en}</h2>
-                      {club.name_ja && (
+                      <h2 className="text-xl font-bold text-slate-900 leading-snug">{lang === 'ja' && club.name_ja ? club.name_ja : club.name_en}</h2>
+                      {lang === 'en' && club.name_ja && (
                         <p className="text-xs font-medium text-slate-400 font-sans">{club.name_ja}</p>
                       )}
                     </div>
 
                     <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 flex-grow">
-                      {club.description_en || "No description provided yet."}
+                      {lang === 'ja' && club.description_ja ? club.description_ja : club.description_en || t('club.noDescription')}
                     </p>
 
                     <button
                       onClick={() => router.push(`/clubs/${club.id}`)}
                       className="w-full bg-[#121824] hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm mt-auto"
                     >
-                      View Details
+                      {t('discovery.viewDetails')}
                     </button>
                   </div>
                 </div>
               ))
             ) : (
               <div className="col-span-full text-center py-20 text-emerald-100 font-medium">
-                No clubs found matching your criteria.
+                {t('discovery.noClubs')}
               </div>
             )}
           </div>

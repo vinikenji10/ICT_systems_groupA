@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs, doc, updateDoc, arrayUnion, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { t, lang } = useTranslation();
 
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +104,7 @@ export default function AdminDashboard() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-20 text-slate-500 font-medium">Verifying Admin Credentials...</div>;
+    return <div className="text-center py-20 text-slate-500 font-medium">{t('admin.verifying')}</div>;
   }
 
   if (!user || !ADMIN_UIDS.includes(user.uid)) return null;
@@ -114,16 +116,16 @@ export default function AdminDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <span className="text-amber-400">👑</span> Central Admin Control
+              <span className="text-amber-400">👑</span> {t('admin.title')}
             </h1>
-            <p className="text-slate-400">Global overview and management of the SIT Club Hub platform.</p>
+            <p className="text-slate-400">{t('admin.subtitle')}</p>
           </div>
           <button 
             onClick={handleCreateNewClub}
             disabled={isCreating}
             className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-800 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
           >
-            {isCreating ? 'Creating...' : '+ Create New Club'}
+            {isCreating ? t('admin.creating') : t('admin.createClub')}
           </button>
         </div>
       </section>
@@ -132,50 +134,50 @@ export default function AdminDashboard() {
         
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <h2 className="font-bold text-xl text-dark border-b border-slate-100 pb-2 mb-4">
-            Assign Club Leader
+            {t('admin.assignLeader')}
           </h2>
           <form onSubmit={handlePromoteLeader} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Target Club</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('admin.targetClub')}</label>
               <select 
                 value={selectedClubId}
                 onChange={(e) => setSelectedClubId(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
                 required
               >
-                <option value="" disabled>Select a club...</option>
+                <option value="" disabled>{t('admin.selectClub')}</option>
                 {clubs.map(c => (
-                  <option key={c.id} value={c.id}>{c.name_en} ({c.category})</option>
+                  <option key={c.id} value={c.id}>{lang === 'ja' && c.name_ja ? c.name_ja : c.name_en} ({c.category})</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Student UID</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('admin.studentUid')}</label>
               <input 
                 type="text" 
                 value={studentUid}
                 onChange={(e) => setStudentUid(e.target.value)}
-                placeholder="Paste User ID here..."
+                placeholder={t('admin.uidPlaceholder')}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
                 required
               />
-              <p className="text-xs text-slate-500 mt-1">Make sure you have the exact Firebase UID.</p>
+              <p className="text-xs text-slate-500 mt-1">{t('admin.uidHint')}</p>
             </div>
             <button 
               type="submit"
               disabled={isPromoting}
               className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-lg mt-2 disabled:bg-slate-400 transition-colors"
             >
-              {isPromoting ? 'Promoting...' : 'Promote & Link'}
+              {isPromoting ? t('admin.promoting') : t('admin.promote')}
             </button>
           </form>
         </div>
 
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-            <h2 className="font-bold text-xl text-dark">Global Club Directory</h2>
+            <h2 className="font-bold text-xl text-dark">{t('admin.globalDirectory')}</h2>
             <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
-              {clubs.length} Total
+              {clubs.length} {t('admin.total')}
             </span>
           </div>
           
@@ -183,7 +185,7 @@ export default function AdminDashboard() {
             {clubs.map((club) => (
               <li key={club.id} className="p-4 hover:bg-slate-50 transition-colors flex justify-between items-center">
                 <div>
-                  <h3 className="font-bold text-slate-900">{club.name_en}</h3>
+                  <h3 className="font-bold text-slate-900">{lang === 'ja' && club.name_ja ? club.name_ja : club.name_en}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
                       {club.category}
@@ -200,13 +202,13 @@ export default function AdminDashboard() {
                     onClick={() => router.push(`/dashboard/events/${club.id}`)}
                     className="text-sm font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 px-4 py-2 rounded-lg transition-colors"
                   >
-                    Events
+                    {t('admin.events')}
                   </button>
                   <button 
                     onClick={() => router.push(`/dashboard/edit/${club.id}`)}
                     className="text-sm font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg transition-colors"
                   >
-                    Edit
+                    {t('admin.edit')}
                   </button>
                 </div>
               </li>

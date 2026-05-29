@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/useTranslation';
 
 export default function Navbar() {
-  const { user, userRole, loginWithGoogle, logout } = useAuth();
+  const { user, userRole, logout } = useAuth();
+  const { lang, toggleLang } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <nav className="w-full bg-white shadow-sm sticky top-0 z-50 border-b border-slate-200">
@@ -18,32 +22,34 @@ export default function Navbar() {
                 alt="SIT Logo" 
                 className="h-10 w-auto"
               />
-              <span className="font-bold text-xl text-slate-800 tracking-tight">Club Hub</span>
+              <span className="font-bold text-xl text-slate-800 tracking-tight">{t('nav.clubHub')}</span>
             </Link>
           </div>
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-8 items-center">
             <Link href="/" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
-              Discovery
+              {t('nav.discovery')}
             </Link>
             <Link href="/events" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
-              Events
+              {t('nav.events')}
             </Link>
             <Link href="/schedule" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
-              Planner
+              {t('nav.planner')}
             </Link>
-            {/* Show Leader Portal only if user has the 'leader' role */}
             {userRole === 'leader' && (
               <Link href="/dashboard" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
-                Leader Portal
+                {t('nav.leaderPortal')}
               </Link>
             )}
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="text-sm font-medium text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors">
-              EN / 日本語
+            <button
+              onClick={toggleLang}
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
+            >
+              {lang === 'en' ? '日本語' : 'EN'}
             </button>
             
             {user ? (
@@ -56,7 +62,7 @@ export default function Navbar() {
                   onClick={logout}
                   className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
-                  Sign Out
+                  {t('nav.signOut')}
                 </button>
               </div>
             ) : (
@@ -64,7 +70,7 @@ export default function Navbar() {
                 href="/login"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Sign In
+                {t('nav.signIn')}
               </Link>
             )}
           </div>

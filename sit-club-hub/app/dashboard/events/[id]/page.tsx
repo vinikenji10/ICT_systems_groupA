@@ -5,12 +5,14 @@ import { useRouter, useParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { ClubEvent } from '@/app/types';
-import { ADMIN_UIDS } from '@/app/utils/constants'; // Importing the master key array
+import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function ManageEvents() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
   const params = useParams();
   const clubId = params.id as string; 
   
@@ -129,65 +131,69 @@ export default function ManageEvents() {
   };
 
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-500">Loading events...</div>;
+    return <div className="text-center py-20 text-slate-500">{t('eventsManage.loading')}</div>;
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-dark">Manage Events</h1>
-          <p className="text-slate-600 mt-1">Schedule practices and meetings for {clubName}</p>
+      <section className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">{t('eventsManage.title')}</h1>
+            <p className="text-slate-600 mt-1">{t('eventsManage.subtitle', { clubName })}</p>
+          </div>
+          <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-slate-900 font-medium">
+            &larr; {t('eventsManage.back')}
+          </button>
         </div>
-        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-dark font-medium">
-          &larr; Back to Dashboard
-        </button>
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Event Creation Form */}
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-          <h2 className="font-bold text-xl text-dark mb-4">Create Event</h2>
+          <h2 className="font-bold text-xl text-dark mb-4">{t('eventsManage.create')}</h2>
           <form onSubmit={handleAddEvent} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Title (EN)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.titleEn')}</label>
               <input type="text" required value={titleEn} onChange={e => setTitleEn(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Title (JA)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.titleJa')}</label>
               <input type="text" required value={titleJa} onChange={e => setTitleJa(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Location (EN)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.locationEn')}</label>
               <input type="text" required value={locationEn} onChange={e => setLocationEn(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Location (JA)</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.locationJa')}</label>
               <input type="text" required value={locationJa} onChange={e => setLocationJa(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Start</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.start')}</label>
                 <input type="datetime-local" required value={startTime} onChange={e => setStartTime(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">End</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">{t('eventsManage.end')}</label>
                 <input type="datetime-local" required value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
               </div>
             </div>
             <button type="submit" disabled={isSaving} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-4 disabled:bg-blue-300 transition-colors">
-              {isSaving ? 'Saving...' : 'Add Event'}
+              {isSaving ? t('eventsManage.saving') : t('eventsManage.add')}
             </button>
           </form>
         </div>
 
         {/* Scheduled Events List */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="font-bold text-xl text-dark mb-4">Upcoming Schedule</h2>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 className="font-bold text-xl text-slate-900">{t('eventsManage.upcoming')}</h2>
+          </div>
           {events.length === 0 ? (
             <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 text-center text-slate-500">
-              No events scheduled yet.
+              {t('eventsManage.none')}
             </div>
           ) : (
             events.map(event => (
@@ -200,7 +206,7 @@ export default function ManageEvents() {
                   </p>
                 </div>
                 <button onClick={() => handleDeleteEvent(event.id)} className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                  Delete
+                  {t('eventsManage.delete')}
                 </button>
               </div>
             ))

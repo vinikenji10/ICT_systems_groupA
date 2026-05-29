@@ -5,11 +5,13 @@ import { useRouter, useParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useTranslation } from '@/app/contexts/useTranslation';
 import { Application } from '@/app/types';
 
 export default function ManageApplications() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
   const params = useParams();
   const clubId = params.id as string; 
 
@@ -55,7 +57,7 @@ export default function ManageApplications() {
             studentId: appData.studentId,
             studentName: studentData.displayName,
             studentEmail: studentData.email,
-            message: appData.message || 'No message provided.',
+            message: appData.message || t('apps.noMessage'),
             status: appData.status,
             appliedAt: appData.appliedAt?.toDate() || new Date(),
           });
@@ -90,25 +92,25 @@ export default function ManageApplications() {
   };
 
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-500">Loading applications...</div>;
+    return <div className="text-center py-20 text-slate-500">{t('apps.loading')}</div>;
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-dark">Manage Applications</h1>
-          <p className="text-slate-600 mt-1">Review join requests for {clubName}</p>
+          <h1 className="text-3xl font-bold text-dark">{t('apps.title')}</h1>
+          <p className="text-slate-600 mt-1">{t('apps.subtitle', { clubName })}</p>
         </div>
         <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-dark font-medium">
-          &larr; Back to Dashboard
+          &larr; {t('apps.back')}
         </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {applications.length === 0 ? (
           <div className="p-8 text-center text-slate-500">
-            No applications found for this club yet.
+            {t('apps.none')}
           </div>
         ) : (
           <ul className="divide-y divide-slate-200">
@@ -130,19 +132,19 @@ export default function ManageApplications() {
                     "{app.message}"
                   </div>
                   <p className="text-xs text-slate-400 mt-2">
-                    Applied on: {app.appliedAt.toLocaleDateString()}
+                    {t('apps.appliedOn', { date: app.appliedAt.toLocaleDateString() })}
                   </p>
                 </div>
 
                 <div className="flex shrink-0 gap-3">
                   {app.status !== 'approved' && (
                     <button onClick={() => handleUpdateStatus(app.id, 'approved')} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                      Approve
+                      {t('apps.approve')}
                     </button>
                   )}
                   {app.status !== 'rejected' && (
                     <button onClick={() => handleUpdateStatus(app.id, 'rejected')} className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                      Reject
+                      {t('apps.reject')}
                     </button>
                   )}
                 </div>
