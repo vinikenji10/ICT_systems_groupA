@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/app/firebase/config'; // Adjust path if necessary
+import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 
-// Interface for the Club data
+// Interface for the Club data updated with new structured fields
 interface Club {
   id: string;
   name_en: string;
@@ -15,6 +15,16 @@ interface Club {
   description_en: string;
   description_ja: string;
   tags: string[];
+  logoUrl?: string;
+  activity?: string;
+  level?: string;
+  schedule?: string;
+  scheduleInfo?: string;
+  location?: string;
+  mainPlaces?: string;
+  equipment?: string;
+  membershipFee?: string;
+  payment?: string;
 }
 
 export default function ClubDetails() {
@@ -54,7 +64,7 @@ export default function ClubDetails() {
     fetchClub();
   }, [clubId, router]);
 
-  // Check if the current user has already applied to this club
+  // Check if the current user has already applied
   useEffect(() => {
     if (!user || authLoading) return;
 
@@ -70,7 +80,6 @@ export default function ClubDetails() {
 
         if (!querySnapshot.empty) {
           setHasApplied(true);
-          // Assuming a student only has one active application per club
           setApplicationStatus(querySnapshot.docs[0].data().status);
         }
       } catch (error) {
@@ -96,7 +105,7 @@ export default function ClubDetails() {
         clubId: clubId,
         studentId: user.uid,
         status: 'pending',
-        message: 'I am interested in joining this club!', // Default message for one-click
+        message: 'I am interested in joining this club!',
         appliedAt: serverTimestamp()
       });
 
@@ -121,9 +130,18 @@ export default function ClubDetails() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header Section */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        {/* Placeholder for Banner Image */}
-        <div className="h-48 bg-slate-200 flex items-center justify-center">
-          <span className="text-slate-400">Banner Image Placeholder</span>
+        
+        {/* Image Section */}
+        <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
+          {club.logoUrl ? (
+            <img
+              src={club.logoUrl}
+              alt={`Banner of ${club.name_en}`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-slate-400 font-medium">Banner Image Placeholder</span>
+          )}
         </div>
         
         <div className="p-8">
@@ -176,24 +194,70 @@ export default function ClubDetails() {
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
           <h3 className="font-bold text-xl text-slate-800 mb-4">About Us</h3>
           <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-            {club.description_en}
+            {club.description_en || "No description provided."}
           </p>
         </div>
         
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
           <h3 className="font-bold text-xl text-slate-800 mb-4">クラブについて</h3>
           <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-            {club.description_ja}
+            {club.description_ja || "詳細はありません。"}
           </p>
         </div>
       </div>
 
-      {/* Placeholder for Events/Timetable */}
+      {/* Structured Information Section */}
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-        <h3 className="font-bold text-xl text-slate-800 mb-4">Upcoming Events</h3>
-        <p className="text-slate-500 text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-          Events integration coming soon...
-        </p>
+        <h3 className="font-bold text-xl text-slate-800 mb-6">Detailed Information</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 text-sm">
+          
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Activity</span>
+            <span className="text-slate-600">{club.activity || '-'}</span>
+          </div>
+          
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Level</span>
+            <span className="text-slate-600">{club.level || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Schedule</span>
+            <span className="text-slate-600">{club.schedule || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Schedule Info</span>
+            <span className="text-slate-600">{club.scheduleInfo || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Location</span>
+            <span className="text-slate-600">{club.location || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Main Places</span>
+            <span className="text-slate-600">{club.mainPlaces || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Equipment</span>
+            <span className="text-slate-600">{club.equipment || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Membership Fee</span>
+            <span className="text-slate-600">{club.membershipFee || '-'}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row py-3 md:col-span-2 border-b border-slate-100 gap-2 md:gap-4">
+            <span className="font-bold text-slate-800 md:w-32 shrink-0">Payment Info</span>
+            <span className="text-slate-600">{club.payment || '-'}</span>
+          </div>
+
+        </div>
       </div>
 
     </div>

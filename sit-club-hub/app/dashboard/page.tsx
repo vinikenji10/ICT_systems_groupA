@@ -97,14 +97,17 @@ export default function LeaderDashboard() {
               </div>
               
               <div className="mt-auto pt-6 flex gap-3">
-                <button className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-semibold transition-colors">
+                <button 
+                  onClick={() => router.push(`/dashboard/edit/${club.id}`)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
                   Edit Profile
                 </button>
-                <button 
-                onClick={() => router.push(`/dashboard/applications/${club.id}`)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
+                <button
+                  onClick={() => router.push(`/dashboard/applications/${club.id}`)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
                 >
-                Manage Apps
+                  Manage Apps
                 </button>
               </div>
             </div>

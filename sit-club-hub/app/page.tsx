@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { collection, getDocs, writeBatch, doc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { db } from './firebase/config'; // Ajuste o caminho se a sua pasta firebase estiver em outro lugar
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/app/firebase/config";
 
-// Definindo a interface para o TypeScript
+
 interface Club {
   id: string;
   name_en: string;
@@ -14,224 +14,201 @@ interface Club {
   description_en: string;
   description_ja: string;
   tags: string[];
-  status: string;
+  logoUrl?: string;
+  activity?: string;
+  level?: string;
+  schedule?: string;
+  scheduleInfo?: string;
+  location?: string;
+  mainPlaces?: string;
+  equipment?: string;
+  membershipFee?: string;
+  payment?: string;
 }
 
-export default function Home() {
-  const router = useRouter()
+export default function DiscoveryPage() {
+  const router = useRouter();
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
-  const categories = ['All', 'Engineering', 'Esports', 'Sports', 'Cultural', 'Design'];
+  
+  // Estados de busca e filtragem
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Função para buscar os dados do Firestore
-  const fetchClubs = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, 'clubs'));
-      const clubsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Club[];
-      setClubs(clubsData);
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const categories = ["All", "Engineering", "Esports", "Sports", "Cultural", "Design"];
 
-  // Executa a busca assim que a página carregar
+  // Carrega os clubes diretamente do Firestore (sem função de popular)
   useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "clubs"));
+        const clubsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Club[];
+
+        setClubs(clubsData);
+        setFilteredClubs(clubsData);
+      } catch (error) {
+        console.error("Error fetching clubs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchClubs();
   }, []);
 
-  // Função temporária para injetar os dados (Seeding)
-const handleSeed = async () => {
-  try {
-    const batch = writeBatch(db);
-    const clubsRef = collection(db, 'clubs');
-    const eventsRef = collection(db, 'events');
+  // Lógica de filtragem por barra de pesquisa e categorias laterais
+  useEffect(() => {
+    let result = clubs;
 
-    const seedClubs = [
-      {
-        name_en: "SIT Tactical FPS Team",
-        name_ja: "SIT戦術的FPSチーム",
-        category: "Esports",
-        description_en: "Competitive team focused on high-level play in tactical shooters.",
-        description_ja: "タクティカルシューターでのハイレベルなプレイに焦点を当てた競技チーム。",
-        tags: ["Competitive", "PC Gaming"],
-        status: "active",
-        leaderIds: [], 
-        // Newly added fields based on our final schema:
-        logoUrl: "https://placehold.co/150x150/e2e8f0/475569.png?text=FPS+Logo",
-        bannerUrl: "https://placehold.co/800x200/e2e8f0/475569.png?text=Tactical+FPS+Banner",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      },
-      {
-        name_en: "Applied AI & Data Lab",
-        name_ja: "応用AI・データラボ",
-        category: "Engineering",
-        description_en: "Practical data science and development using Python.",
-        description_ja: "Pythonを使用した実践的なデータサイエンスと開発。",
-        tags: ["Python", "AI"],
-        status: "active",
-        leaderIds: [],
-        // Newly added fields based on our final schema:
-        logoUrl: "https://placehold.co/150x150/e2e8f0/475569.png?text=AI+Logo",
-        bannerUrl: "https://placehold.co/800x200/e2e8f0/475569.png?text=AI+Lab+Banner",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }
-    ];
+    // Filtro por Categoria
+    if (selectedCategory !== "All") {
+      result = result.filter((club) => 
+        club.category?.toLowerCase() === selectedCategory.toLowerCase() || 
+        club.tags?.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase())
+      );
+    }
 
-    const clubIds: string[] = [];
+    // Filtro por Texto (Nome, Nome em Japonês ou Tags)
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (club) =>
+          club.name_en.toLowerCase().includes(query) ||
+          club.name_ja?.toLowerCase().includes(query) ||
+          club.tags?.some((tag) => tag.toLowerCase().includes(query))
+      );
+    }
 
-    seedClubs.forEach((club) => {
-      const newClubRef = doc(clubsRef);
-      clubIds.push(newClubRef.id);
-      batch.set(newClubRef, club);
-    });
+    setFilteredClubs(result);
+  }, [searchQuery, selectedCategory, clubs]);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    const seedEvents = [
-      {
-        clubId: clubIds[0], 
-        title_en: "Valorant Strategy Meeting",
-        title_ja: "Valorant 戦略会議",
-        description_en: "Planning for the upcoming inter-university tournament.",
-        description_ja: "次回の大学間トーナメントの計画。",
-        location: "Omiya Campus - Room 402",
-        startTime: Timestamp.fromDate(tomorrow),
-        endTime: Timestamp.fromDate(new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000)),
-        isPublic: true,
-        // Optional cover image for the event:
-        coverUrl: "https://placehold.co/400x200/e2e8f0/475569.png?text=Valorant+Event"
-      },
-      {
-        clubId: clubIds[1], 
-        title_en: "LLM Hackathon 2024",
-        title_ja: "LLM ハッカソン 2024",
-        description_en: "Build your own AI agent in 4 hours.",
-        description_ja: "4時間で独自のAIエージェントを構築します。",
-        location: "Building 2 - Collaborative Space",
-        startTime: Timestamp.fromDate(nextWeek),
-        endTime: Timestamp.fromDate(new Date(nextWeek.getTime() + 4 * 60 * 60 * 1000)),
-        isPublic: true,
-        coverUrl: "https://placehold.co/400x200/e2e8f0/475569.png?text=Hackathon"
-      }
-    ];
-
-    seedEvents.forEach((event) => {
-      const newEventRef = doc(eventsRef);
-      batch.set(newEventRef, event);
-    });
-
-    await batch.commit();
-    alert("Banco de dados populado com a modelagem completa!");
-  } catch (error) {
-    console.error("Erro ao popular o banco:", error);
-    alert("Falha ao injetar dados.");
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0d4f37] flex items-center justify-center text-white text-lg">
+        Loading communities...
+      </div>
+    );
   }
-};
 
   return (
-    <div className="space-y-8">
-      {/* Botão Temporário para Injeção de Dados */}
-      {clubs.length === 0 && !loading && (
-        <div className="bg-amber-100 border border-amber-300 text-amber-900 p-4 rounded-xl flex justify-between items-center">
-          <p className="font-medium">O banco de dados parece estar vazio. Deseja popular com os dados de teste?</p>
-          <button 
-            onClick={handleSeed}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md font-bold transition-colors"
-          >
-            Popular Banco de Dados
-          </button>
-        </div>
-      )}
-
-      {/* Cabeçalho e Busca */}
-      <section className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Discover Hidden Communities</h1>
-          <p className="text-slate-600">Find your passion and join student organizations.</p>
-        </div>
+    <div className="min-h-screen bg-[#0d4f37] p-6 md:p-12">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <div className="w-1/3">
-          <input 
-            type="text" 
-            placeholder="Search clubs, sports, tags..." 
-            className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </section>
-
-      {/* Estrutura Principal */}
-      <div className="flex gap-8 items-start">
-        
-        {/* Barra Lateral de Categorias */}
-        <aside className="w-64 flex-shrink-0 sticky top-24">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <h2 className="font-semibold text-slate-800 mb-4 px-2 uppercase tracking-wider text-sm">Categories</h2>
-            <ul className="space-y-1">
-              {categories.map((category) => (
-                <li key={category}>
-                  <button className="w-full text-left px-3 py-2 text-slate-600 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors font-medium text-sm">
-                    {category}
-                  </button>
-                </li>
-              ))}
-            </ul>
+        {/* Banner de Pesquisa Principal */}
+        <div className="bg-white rounded-2xl p-8 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-extrabold text-slate-900">Discover Hidden Communities</h1>
+            <p className="text-slate-500 font-medium">Find your passion and join student organizations.</p>
           </div>
-        </aside>
+          <div className="w-full md:w-96">
+            <input
+              type="text"
+              placeholder="Search clubs, sports, tags..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium bg-slate-50 text-slate-800 placeholder-slate-400"
+            />
+          </div>
+        </div>
 
-        {/* Grid de Organizações Dinâmico */}
-        <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            <div className="col-span-full flex justify-center py-10">
-              <p className="text-slate-500 font-medium animate-pulse">Carregando clubes...</p>
+        {/* Layout Principal: Categorias + Grid de Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+          
+          {/* Menu Lateral de Categorias */}
+          <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">Categories</h3>
+            <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm ${
+                    selectedCategory === category
+                      ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
-          ) : (
-            clubs.map((club) => (
-              <div key={club.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all cursor-pointer flex flex-col">
-                <div className="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100">
-                  <span className="text-slate-400 text-sm">Image Placeholder</span>
-                </div>
-                
-                <div className="p-5 flex flex-col flex-grow">
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-md">
-                      {club.category}
-                    </span>
-                    {club.tags.slice(0, 2).map((tag, idx) => (
-                      <span key={idx} className="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">
-                        {tag}
-                      </span>
-                    ))}
+          </div>
+
+          {/* Grid de Clubes */}
+          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredClubs.length > 0 ? (
+              filteredClubs.map((club) => (
+                <div
+                  key={club.id}
+                  className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-slate-100 group transition-all hover:shadow-xl hover:-translate-y-1"
+                >
+                  {/* Seção da Imagem / Logo com renderização condicional dinâmica */}
+                  <div className="h-48 w-full bg-slate-100 relative overflow-hidden shrink-0 border-b border-slate-100">
+                    {club.logoUrl ? (
+                      <img
+                        src={club.logoUrl}
+                        alt={`Logo of ${club.name_en}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-medium">
+                        Image Placeholder
+                      </div>
+                    )}
                   </div>
-                  
-                  <h3 className="font-bold text-lg text-slate-900 leading-tight mb-1">{club.name_en}</h3>
-                  <p className="text-xs text-slate-500 mb-3 font-medium">{club.name_ja}</p>
-                  
-                  <p className="text-sm text-slate-600 mb-6 line-clamp-3 flex-grow">
-                    {club.description_en}
-                  </p>
-                  
-                  <button 
-                    onClick={() => router.push(`/clubs/${club.id}`)}
-                    className="w-full bg-slate-900 hover:bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors mt-auto"
-                  >
-                    View Details
-                  </button>
+
+                  {/* Conteúdo do Card */}
+                  <div className="p-6 flex flex-col flex-grow space-y-4">
+                    {/* Tags do Clube */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {club.tags?.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className={`text-[11px] font-bold px-2.5 py-1 rounded-md tracking-wide ${
+                            idx === 0
+                              ? "bg-blue-50 text-blue-700"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Títulos (EN / JA) */}
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-bold text-slate-900 leading-snug">{club.name_en}</h2>
+                      {club.name_ja && (
+                        <p className="text-xs font-medium text-slate-400 font-sans">{club.name_ja}</p>
+                      )}
+                    </div>
+
+                    {/* Descrição */}
+                    <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 flex-grow">
+                      {club.description_en || "No description provided yet."}
+                    </p>
+
+                    {/* Botão de Ação */}
+                    <button
+                      onClick={() => router.push(`/clubs/${club.id}`)}
+                      className="w-full bg-[#121824] hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm mt-auto"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20 text-emerald-100 font-medium">
+                No clubs found matching your criteria.
               </div>
-            ))
-          )}
+            )}
+          </div>
+
         </div>
       </div>
     </div>
