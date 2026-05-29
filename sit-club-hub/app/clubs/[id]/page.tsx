@@ -166,14 +166,14 @@ export default function ClubDetails() {
       {/* Description Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-bold text-xl text-slate-800 mb-4">About Us</h3>
+          <h3 className="font-bold text-xl text-dark mb-4">About Us</h3>
           <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
             {club.description_en || "No description provided."}
           </p>
         </div>
         
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-bold text-xl text-slate-800 mb-4">クラブについて</h3>
+          <h3 className="font-bold text-xl text-dark mb-4">クラブについて</h3>
           <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
             {club.description_ja || "詳細はありません。"}
           </p>
@@ -183,7 +183,7 @@ export default function ClubDetails() {
       {/* Structured Information Section - AGORA DINÂMICA COM O IDIOMA */}
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-xl text-slate-800">Detailed Information</h3>
+          <h3 className="font-bold text-xl text-dark">Detailed Information</h3>
           
           {/* Seletor de Idioma Local */}
           <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
@@ -205,47 +205,47 @@ export default function ClubDetails() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 text-sm">
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Activity' : '活動内容'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Activity' : '活動内容'}</span>
             <span className="text-slate-600">{club[`activity_${displayLang}`] || '-'}</span>
           </div>
           
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Level' : 'レベル'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Level' : 'レベル'}</span>
             <span className="text-slate-600">{club[`level_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule' : '活動日時'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule' : '活動日時'}</span>
             <span className="text-slate-600">{club[`schedule_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule Info' : '予定の詳細'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Schedule Info' : '予定の詳細'}</span>
             <span className="text-slate-600">{club[`scheduleInfo_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Location' : '活動場所'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Location' : '活動場所'}</span>
             <span className="text-slate-600">{club[`location_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Main Places' : '主な場所'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Main Places' : '主な場所'}</span>
             <span className="text-slate-600">{club[`mainPlaces_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Equipment' : '必要なもの'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Equipment' : '必要なもの'}</span>
             <span className="text-slate-600">{club[`equipment_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Membership Fee' : '部費'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Membership Fee' : '部費'}</span>
             <span className="text-slate-600">{club[`membershipFee_${displayLang}`] || '-'}</span>
           </div>
 
           <div className="flex flex-col md:flex-row py-3 md:col-span-2 border-b border-slate-100 gap-2 md:gap-4">
-            <span className="font-bold text-slate-800 md:w-32 shrink-0">{displayLang === 'en' ? 'Payment Info' : '支払いについて'}</span>
+            <span className="font-bold text-dark md:w-32 shrink-0">{displayLang === 'en' ? 'Payment Info' : '支払いについて'}</span>
             <span className="text-slate-600">{club[`payment_${displayLang}`] || '-'}</span>
           </div>
 

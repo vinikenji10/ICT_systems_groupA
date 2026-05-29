@@ -69,7 +69,7 @@ export default function CampusEvents() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <section className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Campus Events</h1>
+        <h1 className="text-3xl font-bold text-dark mb-2">Campus Events</h1>
         <p className="text-slate-600">Discover upcoming practices, meetings, and activities across all SIT clubs.</p>
       </section>
 
@@ -88,7 +88,7 @@ export default function CampusEvents() {
 
             return (
               <div key={event.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-                <div className="bg-blue-600 text-white px-5 py-3 flex justify-between items-center">
+                <div className="bg-primary text-white px-5 py-3 flex justify-between items-center">
                   <span className="font-bold tracking-wide">{dateString}</span>
                   <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
                     {event.category}
@@ -111,7 +111,7 @@ export default function CampusEvents() {
                     </div>
                     <div className="flex items-center text-sm text-slate-600">
                       <span className="w-5 font-bold">🏢</span>
-                      <span className="font-medium text-blue-600 hover:underline cursor-pointer" onClick={() => router.push(`/clubs/${event.clubId}`)}>
+                      <span className="font-medium text-primary hover:underline cursor-pointer" onClick={() => router.push(`/clubs/${event.clubId}`)}>
                         {event.clubName}
                       </span>
                     </div>
@@ -119,7 +119,7 @@ export default function CampusEvents() {
 
                   <button 
                     onClick={() => router.push(`/clubs/${event.clubId}`)}
-                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-lg transition-colors mt-auto text-sm"
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-dark font-semibold py-2.5 rounded-lg transition-colors mt-auto text-sm"
                   >
                     View Club Details
                   </button>

@@ -131,7 +131,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <h2 className="font-bold text-xl text-slate-800 border-b border-slate-100 pb-2 mb-4">
+          <h2 className="font-bold text-xl text-dark border-b border-slate-100 pb-2 mb-4">
             Assign Club Leader
           </h2>
           <form onSubmit={handlePromoteLeader} className="space-y-4">
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
 
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-            <h2 className="font-bold text-xl text-slate-800">Global Club Directory</h2>
+            <h2 className="font-bold text-xl text-dark">Global Club Directory</h2>
             <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
               {clubs.length} Total
             </span>

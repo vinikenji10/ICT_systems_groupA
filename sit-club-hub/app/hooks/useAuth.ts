@@ -12,14 +12,25 @@ import { auth, db } from '../firebase/config';
 // Define the allowed institutional domain here
 const ALLOWED_DOMAIN = '@shibaura-it.ac.jp'; 
 
+// Add specific email addresses here to bypass the domain requirement
+const ALLOWED_EMAILS = [
+  'rne1111591@gmail.com',
+];
+
 export function useAuth() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper to check domain
+  // Helper to check domain or explicit allowed emails
   const isValidDomain = (email: string | null) => {
     if (!email) return false;
+    
+    // Bypass for specific team members
+    if (ALLOWED_EMAILS.includes(email.toLowerCase())) {
+      return true;
+    }
+    
     return email.endsWith(ALLOWED_DOMAIN);
   };
 

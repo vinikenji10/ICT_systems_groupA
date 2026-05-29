@@ -201,10 +201,10 @@ export default function EditClub() {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-800">Edit: {headerName}</h1>
+        <h1 className="text-3xl font-bold text-primary">Edit: {headerName}</h1>
         <button 
           onClick={() => ADMIN_UIDS.includes(user?.uid || '') ? router.push('/admin') : router.push('/dashboard')}
-          className="text-slate-500 hover:text-slate-800 font-medium"
+          className="text-slate-500 hover:text-dark font-medium"
         >
           &larr; Back
         </button>
@@ -213,7 +213,7 @@ export default function EditClub() {
       <form onSubmit={handleSave} className="space-y-8">
         
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Basic Info & Image</h2>
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">Basic Info & Image</h2>
           
           {/* Club Name Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
@@ -256,7 +256,7 @@ export default function EditClub() {
         </div>
 
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2">Detailed Information (Bilingual)</h2>
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2">Detailed Information (Bilingual)</h2>
           
           {/* Helper function to render bilingual rows cleanly */}
           {[
@@ -284,7 +284,7 @@ export default function EditClub() {
         </div>
 
         <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800 border-b border-slate-100 pb-2 mb-6">Private Settings</h2>
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2 mb-6">Private Settings</h2>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Official LINE Group Link (Private)</label>
             <input type="url" value={lineLink} onChange={(e) => setLineLink(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://line.me/R/ti/g/..." />

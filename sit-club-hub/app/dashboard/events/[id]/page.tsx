@@ -136,10 +136,10 @@ export default function ManageEvents() {
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Manage Events</h1>
+          <h1 className="text-3xl font-bold text-dark">Manage Events</h1>
           <p className="text-slate-600 mt-1">Schedule practices and meetings for {clubName}</p>
         </div>
-        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-slate-800 font-medium">
+        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-dark font-medium">
           &larr; Back to Dashboard
         </button>
       </div>
@@ -148,7 +148,7 @@ export default function ManageEvents() {
         
         {/* Event Creation Form */}
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-          <h2 className="font-bold text-xl text-slate-800 mb-4">Create Event</h2>
+          <h2 className="font-bold text-xl text-dark mb-4">Create Event</h2>
           <form onSubmit={handleAddEvent} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Title (EN)</label>
@@ -184,7 +184,7 @@ export default function ManageEvents() {
 
         {/* Scheduled Events List */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="font-bold text-xl text-slate-800 mb-4">Upcoming Schedule</h2>
+          <h2 className="font-bold text-xl text-dark mb-4">Upcoming Schedule</h2>
           {events.length === 0 ? (
             <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 text-center text-slate-500">
               No events scheduled yet.

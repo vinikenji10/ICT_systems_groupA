@@ -33,7 +33,7 @@ export default function Login() {
         </h1>
         <p className="text-slate-600 text-sm leading-relaxed">
           Please sign in using your official SIT student email<br/>
-          <span className="font-semibold text-slate-800">(@shibaura-it.ac.jp)</span>
+          <span className="font-semibold text-dark">(@shibaura-it.ac.jp)</span>
         </p>
       </div>
 

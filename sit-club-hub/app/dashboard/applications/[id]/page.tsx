@@ -97,10 +97,10 @@ export default function ManageApplications() {
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Manage Applications</h1>
+          <h1 className="text-3xl font-bold text-dark">Manage Applications</h1>
           <p className="text-slate-600 mt-1">Review join requests for {clubName}</p>
         </div>
-        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-slate-800 font-medium">
+        <button onClick={() => router.push('/dashboard')} className="text-slate-500 hover:text-dark font-medium">
           &larr; Back to Dashboard
         </button>
       </div>
