@@ -109,7 +109,7 @@ export default function ClubDetails() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
           {club.logoUrl ? (
             <img

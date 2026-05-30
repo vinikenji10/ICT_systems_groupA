@@ -103,7 +103,7 @@ export default function DiscoveryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
           <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2">{t('discovery.categories')}</h3>
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-2">{t('discovery.categories')}</h3>
             <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
               {categories.map((category) => (
                 <button
@@ -111,7 +111,7 @@ export default function DiscoveryPage() {
                   onClick={() => setSelectedCategory(category)}
                   className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm ${
                     selectedCategory === category
-                      ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                      ? "bg-background text-foreground shadow-sm"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
@@ -126,7 +126,7 @@ export default function DiscoveryPage() {
               filteredClubs.map((club) => (
                 <div
                   key={club.id}
-                  className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col border border-slate-100 group transition-all hover:shadow-xl hover:-translate-y-1"
+                  className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col group transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="h-48 w-full bg-slate-100 relative overflow-hidden shrink-0 border-b border-slate-100">
                     {club.logoUrl ? (

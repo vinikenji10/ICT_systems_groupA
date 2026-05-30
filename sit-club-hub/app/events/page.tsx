@@ -89,7 +89,7 @@ export default function CampusEvents() {
             const timeString = `${event.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
             return (
-              <div key={event.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+              <div key={event.id} className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
                 <div className="bg-primary text-white px-5 py-3 flex justify-between items-center">
                   <span className="font-bold tracking-wide">{dateString}</span>
                   <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
