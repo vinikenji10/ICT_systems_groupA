@@ -13,6 +13,7 @@ export interface Club {
   leaderIds?: string[];
   createdAt?: any;
   updatedAt?: any;
+  instagramUrl?: string;
 
   // Bilingual structured information fields
   activity_en?: string;

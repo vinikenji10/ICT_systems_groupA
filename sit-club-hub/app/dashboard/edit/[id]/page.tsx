@@ -24,6 +24,7 @@ export default function EditClub() {
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionJa, setDescriptionJa] = useState('');
   const [lineLink, setLineLink] = useState('');
+  const [instagramUrl, setInstagramUrl] = useState('');
   
   // Structured Information states (Bilingual)
   const [activityEn, setActivityEn] = useState('');
@@ -84,6 +85,7 @@ export default function EditClub() {
           setDescriptionEn(data.description_en || '');
           setDescriptionJa(data.description_ja || '');
           setLogoUrl(data.logoUrl || '');
+          setInstagramUrl(data.instagramUrl || '');
           
           setActivityEn(data.activity_en || '');
           setActivityJa(data.activity_ja || '');
@@ -154,6 +156,7 @@ export default function EditClub() {
         description_en: descriptionEn,
         description_ja: descriptionJa,
         logoUrl: finalLogoUrl,
+        instagramUrl: instagramUrl,
         activity_en: activityEn,
         activity_ja: activityJa,
         level_en: levelEn,
@@ -318,6 +321,14 @@ export default function EditClub() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white p-8 rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold text-dark border-b border-slate-100 pb-2 mb-6">{t('edit.instagramLink')}</h2>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Instagram URL</label>
+            <input type="url" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://instagram.com/username" />
+          </div>
         </div>
 
         <div className="bg-white p-8 rounded-xl shadow-sm">
