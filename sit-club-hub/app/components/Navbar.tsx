@@ -34,6 +34,9 @@ export default function Navbar() {
             <Link href="/events" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.events')}
             </Link>
+            <Link href="/facilities" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+              {t('nav.facilities')}
+            </Link>
             <Link href="/schedule" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.planner')}
             </Link>

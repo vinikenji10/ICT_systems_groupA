@@ -63,6 +63,22 @@ export interface ClubEvent {
   isPublic: boolean;
 }
 
+export interface Facility {
+  id: string;
+  name_en: string;
+  name_ja: string;
+  description_en: string;
+  description_ja: string;
+  building: string;
+  floor: string;
+  roomNumber: string;
+  imageUrl?: string;
+  facilities: string[];
+  hours_en: string;
+  hours_ja: string;
+  tags: string[];
+}
+
 export interface Application {
   id: string;
   studentId: string;
