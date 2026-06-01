@@ -165,14 +165,7 @@ export default function ClubDetails() {
               )}
             </div>
 
-            <div className="text-right flex items-center gap-3 justify-end">
-              <button 
-                onClick={handleEditClick}
-                disabled={user ? !hasEditPermission : false}
-                className="bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
-              >
-                {t('club.editDetails')}
-              </button>
+            <div className="text-right">
               {!hasApplied ? (
                 <button 
                   onClick={handleApply}
@@ -266,6 +259,20 @@ export default function ClubDetails() {
           </div>
 
         </div>
+      </div>
+
+      {/* Edit this page button (Bottom-most section) */}
+      <div className="flex justify-center pt-6 pb-4">
+        <button
+          onClick={handleEditClick}
+          disabled={user ? !hasEditPermission : false}
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-600 disabled:text-slate-300 disabled:cursor-not-allowed transition-colors"
+        >
+          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+          </svg>
+          <span>{t('club.editThisPage')}</span>
+        </button>
       </div>
     </div>
   );
