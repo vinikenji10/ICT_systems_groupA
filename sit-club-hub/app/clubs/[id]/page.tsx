@@ -158,14 +158,13 @@ export default function ClubDetails() {
             </div>
 
             <div className="text-right flex items-center gap-3 justify-end">
-              {hasEditPermission && (
-                <button 
-                  onClick={() => router.push(`/dashboard/edit/${club.id}`)}
-                  className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
-                >
-                  {t('club.editDetails')}
-                </button>
-              )}
+              <button 
+                onClick={() => router.push(`/dashboard/edit/${club.id}`)}
+                disabled={!hasEditPermission}
+                className="bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+              >
+                {t('club.editDetails')}
+              </button>
               {!hasApplied ? (
                 <button 
                   onClick={handleApply}
