@@ -57,6 +57,7 @@ export const translations = {
     'club.sending': 'Sending...',
     'club.applicationStatus': 'Application Status',
     'club.loading': 'Loading club details...',
+    'club.editDetails': 'Edit Club Details',
 
     'events.title': 'Campus Events',
     'events.subtitle': 'Discover upcoming practices, meetings, and activities across all SIT clubs.',
@@ -209,6 +210,7 @@ export const translations = {
     'club.sending': '送信中...',
     'club.applicationStatus': '申請状況',
     'club.loading': '部活詳細を読み込んでいます...',
+    'club.editDetails': '部活詳細を編集',
 
     'events.title': '開催予定のイベント',
     'events.subtitle': 'SITで開催予定のイベントをチェックしよう',

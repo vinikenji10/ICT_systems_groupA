@@ -8,6 +8,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club } from '@/app/types';
+import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function ClubDetails() {
   const { user, loading: authLoading } = useAuth();
@@ -25,6 +26,11 @@ export default function ClubDetails() {
   const [hasApplied, setHasApplied] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
+
+  const hasEditPermission = !!(user && club && (
+    ADMIN_UIDS.includes(user.uid) || 
+    club.leaderIds?.includes(user.uid)
+  ));
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -151,7 +157,15 @@ export default function ClubDetails() {
               )}
             </div>
 
-            <div className="text-right">
+            <div className="text-right flex items-center gap-3 justify-end">
+              {hasEditPermission && (
+                <button 
+                  onClick={() => router.push(`/dashboard/edit/${club.id}`)}
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+                >
+                  {t('club.editDetails')}
+                </button>
+              )}
               {!hasApplied ? (
                 <button 
                   onClick={handleApply}
