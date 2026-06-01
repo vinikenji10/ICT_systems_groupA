@@ -106,6 +106,14 @@ export default function ClubDetails() {
     }
   };
 
+  const handleEditClick = () => {
+    if (!user) {
+      router.push('/login');
+    } else if (club) {
+      router.push(`/dashboard/edit/${club.id}`);
+    }
+  };
+
   if (loading || authLoading) {
     return <div className="text-center py-20 text-slate-500">{t('club.loading')}</div>;
   }
@@ -159,8 +167,8 @@ export default function ClubDetails() {
 
             <div className="text-right flex items-center gap-3 justify-end">
               <button 
-                onClick={() => router.push(`/dashboard/edit/${club.id}`)}
-                disabled={!hasEditPermission}
+                onClick={handleEditClick}
+                disabled={user ? !hasEditPermission : false}
                 className="bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
               >
                 {t('club.editDetails')}
