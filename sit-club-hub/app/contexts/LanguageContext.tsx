@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'en' | 'ja';
 
@@ -12,13 +12,6 @@ interface LanguageContextType {
 
 const STORAGE_KEY = 'sit-club-hub-lang';
 
-function getInitialLang(): Language {
-  if (typeof window === 'undefined') return 'en';
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === 'en' || stored === 'ja') return stored;
-  return 'en';
-}
-
 function persistLang(lang: Language) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEY, lang);
@@ -28,7 +21,14 @@ function persistLang(lang: Language) {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Language>(getInitialLang);
+  const [lang, setLang] = useState<Language>('en');
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === 'en' || stored === 'ja') {
+      setLang(stored);
+    }
+  }, []);
 
   const setLangAndPersist = (next: Language) => {
     setLang(next);
