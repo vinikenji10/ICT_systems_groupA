@@ -7,7 +7,7 @@ import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useTranslation } from '@/app/contexts/useTranslation';
-import { Club } from '@/app/types';
+import { Club, Category } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 
 export default function ClubDetails() {
@@ -17,6 +17,7 @@ export default function ClubDetails() {
   const clubId = params.id as string;
 
   const [club, setClub] = useState<Club | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   
   const { lang: displayLang } = useLanguage();
@@ -33,7 +34,7 @@ export default function ClubDetails() {
   ));
 
   useEffect(() => {
-    const fetchClub = async () => {
+    const fetchClubAndCategories = async () => {
       try {
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
@@ -43,7 +44,15 @@ export default function ClubDetails() {
         } else {
           alert("Club not found.");
           router.push('/');
+          return;
         }
+
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Category[];
+        setCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching club details:", error);
       } finally {
@@ -51,8 +60,19 @@ export default function ClubDetails() {
       }
     };
 
-    fetchClub();
+    fetchClubAndCategories();
   }, [clubId, router]);
+
+  const getLocalizedCategory = () => {
+    if (!club) return '';
+    const matched = categories.find(
+      c => c.id === club.category
+    );
+    if (matched) {
+      return displayLang === 'ja' && matched.name_ja ? matched.name_ja : matched.name_en;
+    }
+    return club.category;
+  };
 
   useEffect(() => {
     if (!user || authLoading) return;
@@ -140,7 +160,7 @@ export default function ClubDetails() {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-md mb-3 inline-block">
-                {club.category}
+                {getLocalizedCategory()}
               </span>
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="text-3xl font-bold text-slate-900 leading-snug">

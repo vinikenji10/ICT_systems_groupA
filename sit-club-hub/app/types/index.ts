@@ -90,3 +90,9 @@ export interface Application {
   appliedAt: any; // Firestore Timestamp
   clubId?: string;
 }
+
+export interface Category {
+  id: string;
+  name_en: string;
+  name_ja: string;
+}
