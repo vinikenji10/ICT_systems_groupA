@@ -6,57 +6,56 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
 import { useTranslation } from "@/app/contexts/useTranslation";
 import type { TranslationKey } from "@/app/contexts/translations";
-import { Club } from "@/app/types";
+import { Club, Category } from "@/app/types";
 
 export default function DiscoveryPage() {
   const router = useRouter();
   const { t, tt, lang } = useTranslation();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
+  const [dbCategories, setDbCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = ["All", "Engineering", "Esports", "Sports", "Cultural", "Design"];
-  const catKey: Record<string, TranslationKey> = {
-    All: 'discovery.catAll',
-    Engineering: 'discovery.catEngineering',
-    Esports: 'discovery.catEsports',
-    Sports: 'discovery.catSports',
-    Cultural: 'discovery.catCultural',
-    Design: 'discovery.catDesign',
-  };
-
   useEffect(() => {
-    const fetchClubs = async () => {
+    const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "clubs"));
-        const clubsData = querySnapshot.docs.map((doc) => ({
+        const clubsSnapshot = await getDocs(collection(db, "clubs"));
+        const clubsData = clubsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Club[];
 
+        const categoriesSnapshot = await getDocs(collection(db, "categories"));
+        const categoriesData = categoriesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Category[];
+
         setClubs(clubsData);
         setFilteredClubs(clubsData);
+        setDbCategories(categoriesData);
       } catch (error) {
-        console.error("Error fetching clubs:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClubs();
+    fetchData();
   }, []);
 
   useEffect(() => {
     let result = clubs;
 
     if (selectedCategory !== "All") {
-      result = result.filter((club) => 
-        club.category?.toLowerCase() === selectedCategory.toLowerCase() || 
-        club.tags?.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase())
-      );
+      result = result.filter((club) => {
+        const isCategoryMatch = club.category === selectedCategory;
+        const isTagMatch = club.tags?.some(tag => tag === selectedCategory);
+        return isCategoryMatch || isTagMatch;
+      });
     }
 
     if (searchQuery.trim() !== "") {
@@ -70,7 +69,7 @@ export default function DiscoveryPage() {
     }
 
     setFilteredClubs(result);
-  }, [searchQuery, selectedCategory, clubs]);
+  }, [searchQuery, selectedCategory, clubs, dbCategories]);
 
   if (loading) {
     return (
@@ -105,17 +104,28 @@ export default function DiscoveryPage() {
           <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
             <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-2">{t('discovery.categories')}</h3>
             <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
-              {categories.map((category) => (
+              <button
+                key="All"
+                onClick={() => setSelectedCategory("All")}
+                className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm ${
+                  selectedCategory === "All"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                {t('discovery.catAll')}
+              </button>
+              {dbCategories.map((category) => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
                   className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm ${
-                    selectedCategory === category
+                    selectedCategory === category.id
                       ? "bg-background text-foreground shadow-sm"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
-                  {t(catKey[category])}
+                  {lang === 'ja' && category.name_ja ? category.name_ja : category.name_en}
                 </button>
               ))}
             </div>

@@ -6,13 +6,14 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
-import { Club } from '@/app/types';
+import { Club, Category } from '@/app/types';
 
 export default function LeaderDashboard() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t, lang } = useTranslation();
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loadingClubs, setLoadingClubs] = useState(true);
 
   useEffect(() => {
@@ -33,8 +34,15 @@ export default function LeaderDashboard() {
           id: doc.id,
           ...doc.data()
         })) as Club[];
+
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Category[];
         
         setClubs(myClubs);
+        setCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching leader's clubs:", error);
       } finally {
@@ -44,6 +52,16 @@ export default function LeaderDashboard() {
 
     fetchMyClubs();
   }, [user, userRole, authLoading, router]);
+
+  const getLocalizedCategory = (clubCat: string) => {
+    const matched = categories.find(
+      c => c.id === clubCat
+    );
+    if (matched) {
+      return lang === 'ja' && matched.name_ja ? matched.name_ja : matched.name_en;
+    }
+    return clubCat;
+  };
 
   if (authLoading || (user && userRole === 'leader' && loadingClubs)) {
     return (
@@ -76,7 +94,7 @@ export default function LeaderDashboard() {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-1 rounded-md mb-2 inline-block">
-                    {club.category}
+                    {getLocalizedCategory(club.category)}
                   </span>
                   <h3 className="font-bold text-xl text-slate-900 leading-tight">{lang === 'ja' && club.name_ja ? club.name_ja : club.name_en}</h3>
                   <p className="text-sm text-slate-500">{club.name_ja}</p>

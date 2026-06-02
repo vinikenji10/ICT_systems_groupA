@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useTranslation } from '@/app/contexts/useTranslation';
-import { CampusEvent } from '@/app/types';
+import { CampusEvent, Category } from '@/app/types';
 
 export default function CampusEvents() {
   const router = useRouter();
   const { t, lang } = useTranslation();
   const [events, setEvents] = useState<CampusEvent[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,13 @@ export default function CampusEvents() {
             category: data.category 
           };
         });
+
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Category[];
+        setCategories(categoriesData);
 
         const eventsRef = collection(db, 'events');
         const eventsSnapshot = await getDocs(eventsRef);
@@ -64,6 +72,16 @@ export default function CampusEvents() {
     fetchAllEvents();
   }, []);
 
+  const getLocalizedCategory = (clubCat: string) => {
+    const matched = categories.find(
+      c => c.id === clubCat
+    );
+    if (matched) {
+      return lang === 'ja' && matched.name_ja ? matched.name_ja : matched.name_en;
+    }
+    return clubCat;
+  };
+
   if (loading) {
     return <div className="text-center py-20 text-slate-500">{t('events.loading')}</div>;
   }
@@ -93,7 +111,7 @@ export default function CampusEvents() {
                 <div className="bg-primary text-white px-5 py-3 flex justify-between items-center">
                   <span className="font-bold tracking-wide">{dateString}</span>
                   <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
-                    {event.category}
+                    {getLocalizedCategory(event.category)}
                   </span>
                 </div>
                 
