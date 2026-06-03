@@ -1,0 +1,58 @@
+direction: right
+
+# System Architecture for SIT Club Hub
+
+User: "End User\n(Student, Club Leader, Admin)" {
+  shape: person
+}
+
+Cloud: "Google Cloud / Firebase Platform" {
+  Hosting: "Firebase Hosting" {
+    shape: rectangle
+  }
+
+  Frontend: "Next.js Application\n(Vercel/Next.js Framework)" {
+    Pages: "Client Router & Pages" {
+      Discovery: "Discovery / Home\n(Browse & Search)"
+      ClubDetails: "Club Details\n(View & Apply)"
+      Events: "Campus Events\n(Public Events)"
+      Facilities: "Facilities\n(Campus Directory)"
+      Dashboard: "Leader Dashboard\n(Edit Club, Manage Apps)"
+      AdminConsole: "Admin Console\n(Create Clubs, Assign Roles)"
+    }
+    
+    FirebaseClient: "Firebase Client SDK\n(config.ts)"
+  }
+
+  Auth: "Firebase Authentication\n(Google OAuth 2.0)" {
+    shape: rectangle
+  }
+
+  Database: "Cloud Firestore\n(NoSQL database)" {
+    shape: cylinder
+    
+    Clubs: "clubs\n(Club Profiles)"
+    EventsColl: "events\n(Club Events)"
+    FacilitiesColl: "facilities\n(Location Details)"
+    Users: "users\n(User accounts & roles)"
+    Applications: "applications\n(Membership requests)"
+    Categories: "categories\n(Club classification)"
+  }
+
+  Storage: "Cloud Storage\n(Object Store)" {
+    shape: rectangle
+    Logos: "logos/\n(Club logo files)"
+  }
+
+  Functions: "Cloud Functions\n(Python Backend)" {
+    shape: rectangle
+  }
+}
+
+# Interaction Paths
+User -> Cloud.Hosting: "Requests Pages"
+Cloud.Hosting -> Cloud.Frontend: "Serves Static & SSR content"
+Cloud.Frontend.FirebaseClient -> Cloud.Auth: "Authenticates users\n(Google Auth popup)"
+Cloud.Frontend.Pages -> Cloud.Database: "Reads & Writes data\n(Client-side queries)"
+Cloud.Frontend.Pages -> Cloud.Storage: "Uploads / Fetches club logos"
+Cloud.Hosting -> Cloud.Functions: "Routes serverless actions"

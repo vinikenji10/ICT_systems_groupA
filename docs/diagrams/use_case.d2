@@ -1,0 +1,61 @@
+direction: right
+
+# Use Case Diagram for SIT Club Hub
+
+Actors: "System Roles" {
+  Student: "Student / General User\n(Authenticated via @shibaura-it.ac.jp)" {
+    shape: person
+  }
+  
+  Leader: "Club Leader\n(Assigned leader role)" {
+    shape: person
+  }
+  
+  Admin: "Administrator\n(Privileged system manager)" {
+    shape: person
+  }
+
+  Leader -> Student: "Inherits permissions from"
+  Admin -> Leader: "Inherits permissions from"
+}
+
+System: "SIT Club Hub System" {
+  style.fill: "#f5f6f8"
+
+  GeneralUseCases: "Public & Student Features" {
+    UC_Login: "Login via Google Account\n(Institutional domain check)"
+    UC_Browse: "Browse & Search Clubs\n(Filter by Category/Tags)"
+    UC_ViewClub: "View Detailed Club Profile"
+    UC_Apply: "Apply to Join a Club\n(Submit Application)"
+    UC_ViewEvents: "View Public Campus Events"
+    UC_ViewFacilities: "View Campus Facilities Directory"
+  }
+
+  LeaderUseCases: "Club Management Features" {
+    UC_EditClub: "Edit Club Profile\n(Update bilingual text & logo)"
+    UC_ManageEvents: "Manage Club Events\n(Create, edit, toggle visibility)"
+    UC_ManageApps: "Manage Member Applications\n(Approve/Reject applicants)"
+  }
+
+  AdminUseCases: "Administrative Features" {
+    UC_CreateClub: "Create Draft Clubs\n(Instantiate new club profiles)"
+    UC_Promote: "Promote Student to Leader\n(Assign UID & update role)"
+    UC_ManageCategories: "Manage Categories\n(Create/edit/delete Firestore categories)"
+  }
+}
+
+# Connections
+Actors.Student -> System.GeneralUseCases.UC_Login
+Actors.Student -> System.GeneralUseCases.UC_Browse
+Actors.Student -> System.GeneralUseCases.UC_ViewClub
+Actors.Student -> System.GeneralUseCases.UC_Apply
+Actors.Student -> System.GeneralUseCases.UC_ViewEvents
+Actors.Student -> System.GeneralUseCases.UC_ViewFacilities
+
+Actors.Leader -> System.LeaderUseCases.UC_EditClub
+Actors.Leader -> System.LeaderUseCases.UC_ManageEvents
+Actors.Leader -> System.LeaderUseCases.UC_ManageApps
+
+Actors.Admin -> System.AdminUseCases.UC_CreateClub
+Actors.Admin -> System.AdminUseCases.UC_Promote
+Actors.Admin -> System.AdminUseCases.UC_ManageCategories
