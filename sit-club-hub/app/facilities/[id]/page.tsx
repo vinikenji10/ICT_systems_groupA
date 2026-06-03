@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Facility } from '@/app/types';
 import DefaultButton from '@/app/components/DefaultButton';
 import InfoCard from '@/app/components/InfoCard';
-import { DEFAULT_BUILDINGS, DEFAULT_FACILITIES } from '../page';
+import { DEFAULT_BUILDINGS, DEFAULT_FACILITIES, Building } from '../page';
 
 export default function BuildingDetails() {
   const router = useRouter();
@@ -16,19 +16,30 @@ export default function BuildingDetails() {
   const { t, lang } = useTranslation();
   const buildingId = params.id as string;
 
+  const [building, setBuilding] = useState<Building | null>(null);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const building = DEFAULT_BUILDINGS.find((b) => b.id === buildingId);
-
   useEffect(() => {
-    if (!building) {
-      router.push('/facilities');
-      return;
-    }
-
-    const fetchFacilities = async () => {
+    const fetchData = async () => {
       try {
+        const buildingRef = doc(db, 'buildings', buildingId);
+        const buildingSnap = await getDoc(buildingRef);
+
+        let buildingData: Building | null = null;
+        if (buildingSnap.exists()) {
+          buildingData = { id: buildingSnap.id, ...buildingSnap.data() } as Building;
+        } else {
+          const localB = DEFAULT_BUILDINGS.find((b) => b.id === buildingId);
+          if (localB) buildingData = localB;
+        }
+
+        if (!buildingData) {
+          router.push('/facilities');
+          return;
+        }
+        setBuilding(buildingData);
+
         const snapshot = await getDocs(collection(db, 'facilities'));
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -36,16 +47,14 @@ export default function BuildingDetails() {
         })) as Facility[];
         setFacilities(data);
       } catch (error) {
-        console.error("Error fetching facilities:", error);
+        console.error("Error fetching building or facilities details:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFacilities();
-  }, [building, router]);
-
-  if (!building) return null;
+    fetchData();
+  }, [buildingId, router]);
 
   if (loading) {
     return (
@@ -54,6 +63,8 @@ export default function BuildingDetails() {
       </div>
     );
   }
+
+  if (!building) return null;
 
   // Filter Firestore facilities for this building
   const dbFacs = facilities.filter((f) => {
@@ -65,8 +76,11 @@ export default function BuildingDetails() {
     } else {
       if (buildingId === 'omiya-b2' && (b.includes('2') || b.includes('two') || b.includes('2号館'))) return true;
       if (buildingId === 'omiya-b5' && (b.includes('5') || b.includes('five') || b.includes('5号館'))) return true;
+      if (buildingId === 'omiya-emergence' && (b.includes('emergence') || b.includes('創発'))) return true;
       if (buildingId === 'omiya-library' && (b.includes('library') || b.includes('図書'))) return true;
       if (buildingId === 'omiya-gym' && (b.includes('gym') || b.includes('体育'))) return true;
+      if (buildingId === 'omiya-global-dorm' && (b.includes('global') || b.includes('国際'))) return true;
+      if (buildingId === 'omiya-hakua-dorm' && (b.includes('hakua') || b.includes('白亜'))) return true;
     }
     return false;
   });
@@ -81,16 +95,15 @@ export default function BuildingDetails() {
 
   return (
     <div className="min-h-screen bg-[#0d4f37] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Back Button */}
-        <div className="flex justify-between items-center">
-          <DefaultButton
+        <div className="flex justify-start">
+          <button
             onClick={() => router.push('/facilities')}
-            variant="outline"
-            className="text-white border-white/20 hover:bg-white/10 hover:text-white px-5 py-2.5 rounded-xl font-bold cursor-pointer"
+            className="text-white/80 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors cursor-pointer"
           >
             ← {lang === 'ja' ? '施設案内一覧に戻る' : 'Back to Directory'}
-          </DefaultButton>
+          </button>
         </div>
 
         {/* Building Card (Similar to Club details layout) */}

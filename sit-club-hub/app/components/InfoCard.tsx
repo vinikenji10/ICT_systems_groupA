@@ -43,32 +43,22 @@ export default function InfoCard({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col group transition-all hover:shadow-xl hover:-translate-y-1 border border-slate-100/50">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col group transition-all hover:shadow-xl hover:-translate-y-1">
       {/* Banner / Image */}
       <ClubLogo logoUrl={imageUrl} name={imageAlt} />
 
       <div className="p-6 flex flex-col flex-grow space-y-4">
-        {/* Category & Tags */}
-        {(categoryName || tags.length > 0) && (
+        {/* Category */}
+        {categoryName && (
           <div className="flex flex-wrap gap-2 items-center">
-            {categoryName && (
-              <span
-                onClick={onCategoryClick}
-                className={`text-xs font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-md transition-colors ${
-                  onCategoryClick ? "cursor-pointer hover:bg-blue-200" : ""
-                }`}
-              >
-                {categoryName}
-              </span>
-            )}
-            {tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md border border-slate-200/40 select-none"
-              >
-                #{tag}
-              </span>
-            ))}
+            <span
+              onClick={onCategoryClick}
+              className={`text-xs font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-md transition-colors ${
+                onCategoryClick ? "cursor-pointer hover:bg-blue-200" : ""
+              }`}
+            >
+              {categoryName}
+            </span>
           </div>
         )}
 
@@ -85,6 +75,20 @@ export default function InfoCard({
             descriptionEn={descriptionEn}
             descriptionJa={descriptionJa}
           />
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 items-center">
+            {tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md border border-slate-200/40 select-none"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
         )}
 
         {/* Optional Details (e.g. for facilities) */}
