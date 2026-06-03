@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { CampusEvent, Category } from '@/app/types';
+import EventCard from '@/app/components/EventCard';
 
 export default function CampusEvents() {
-  const router = useRouter();
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const [events, setEvents] = useState<CampusEvent[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,15 +71,7 @@ export default function CampusEvents() {
     fetchAllEvents();
   }, []);
 
-  const getLocalizedCategory = (clubCat: string) => {
-    const matched = categories.find(
-      c => c.id === clubCat
-    );
-    if (matched) {
-      return lang === 'ja' && matched.name_ja ? matched.name_ja : matched.name_en;
-    }
-    return clubCat;
-  };
+
 
   if (loading) {
     return <div className="text-center py-20 text-slate-500">{t('events.loading')}</div>;
@@ -101,52 +92,13 @@ export default function CampusEvents() {
           </div>
         ) : (
           events.map((event) => {
-            const dateString = event.startTime.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', { 
-              month: 'short', day: 'numeric', year: 'numeric' 
-            });
-            const timeString = `${event.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-
+            const matchedCategory = categories.find((c) => c.id === event.category);
             return (
-              <div key={event.id} className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-                <div className="bg-primary text-white px-5 py-3 flex justify-between items-center">
-                  <span className="font-bold tracking-wide">{dateString}</span>
-                  <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
-                    {getLocalizedCategory(event.category)}
-                  </span>
-                </div>
-                
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-bold text-xl text-slate-900 mb-1">{lang === 'ja' && event.title_ja ? event.title_ja : event.title_en}</h3>
-                  {lang === 'en' && event.title_ja && (
-                    <p className="text-sm text-slate-500 mb-4">{event.title_ja}</p>
-                  )}
-                  
-                  <div className="space-y-2 mt-auto mb-6">
-                    <div className="flex items-center text-sm text-slate-600">
-                      <span className="w-5 font-bold">🕒</span>
-                      <span>{timeString}</span>
-                    </div>
-                    {/* Renderização em Inglês por predefinição nesta página pública */}
-                    <div className="flex items-center text-sm text-slate-600">
-                      <span className="w-5 font-bold">📍</span>
-                      <span>{lang === 'ja' && event.location_ja ? event.location_ja : event.location_en}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-slate-600">
-                      <span className="w-5 font-bold">🏢</span>
-                      <span className="font-medium text-primary hover:underline cursor-pointer" onClick={() => router.push(`/clubs/${event.clubId}`)}>
-                        {event.clubName}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => router.push(`/clubs/${event.clubId}`)}
-                    className="w-full bg-slate-100 hover:bg-slate-200 text-dark font-semibold py-2.5 rounded-lg transition-colors mt-auto text-sm"
-                  >
-                    {t('events.viewClub')}
-                  </button>
-                </div>
-              </div>
+              <EventCard
+                key={event.id}
+                event={event}
+                category={matchedCategory}
+              />
             );
           })
         )}

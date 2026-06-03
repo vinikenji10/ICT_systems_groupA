@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../contexts/useTranslation';
+import DefaultButton from './DefaultButton';
 
 export default function Navbar() {
   const { user, userRole, logout } = useAuth();
@@ -48,12 +49,13 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button
+            <DefaultButton
               onClick={toggleLang}
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
+              variant="outline"
+              className="text-sm font-medium border px-3 py-1.5 rounded-md"
             >
               {lang === 'en' ? '日本語' : 'EN'}
-            </button>
+            </DefaultButton>
             
             {user ? (
               <div className="flex items-center gap-4">
@@ -61,20 +63,22 @@ export default function Navbar() {
                   <p className="text-xs font-bold text-slate-900">{user.displayName}</p>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider">{userRole}</p>
                 </div>
-                <button 
+                <DefaultButton 
                   onClick={logout}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  variant="light"
+                  className="px-4 py-2 rounded-md text-sm font-medium"
                 >
                   {t('nav.signOut')}
-                </button>
+                </DefaultButton>
               </div>
             ) : (
-              <Link 
+              <DefaultButton 
                 href="/login"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                variant="blue"
+                className="px-4 py-2 rounded-md text-sm font-medium"
               >
                 {t('nav.signIn')}
-              </Link>
+              </DefaultButton>
             )}
           </div>
 

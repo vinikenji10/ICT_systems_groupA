@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
+});
+
+const notoSansJP = Noto_Sans_JP({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-noto-sans-jp",
+});
 
 export const metadata: Metadata = {
   title: "SIT Club Hub & AI Assistant",
@@ -18,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-slate-50 min-h-screen flex flex-col text-slate-900`}>
+      <body className={`${roboto.variable} ${notoSansJP.variable} font-sans bg-slate-50 min-h-screen flex flex-col text-slate-900`}>
         <LanguageProvider>
           <Navbar />
           <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

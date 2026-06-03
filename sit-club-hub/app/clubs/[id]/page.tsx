@@ -9,6 +9,7 @@ import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
+import DefaultButton from '@/app/components/DefaultButton';
 
 export default function ClubDetails() {
   const { user, loading: authLoading } = useAuth();
@@ -185,15 +186,16 @@ export default function ClubDetails() {
               )}
             </div>
 
-            <div className="text-right">
+            <div className="hidden md:block text-right shrink-0">
               {!hasApplied ? (
-                <button 
+                <DefaultButton 
                   onClick={handleApply}
                   disabled={isApplying}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+                  variant="blue"
+                  className="px-6 rounded-lg"
                 >
                   {isApplying ? t('club.sending') : t('club.joinClub')}
-                </button>
+                </DefaultButton>
               ) : (
                 <div className="inline-block border border-slate-200 bg-slate-50 px-6 py-3 rounded-lg text-left">
                   <p className="text-sm text-slate-500 mb-1">{t('club.applicationStatus')}</p>
@@ -214,6 +216,29 @@ export default function ClubDetails() {
                 #{tt(tag)}
               </span>
             ))}
+          </div>
+
+          <div className="block md:hidden mt-6">
+            {!hasApplied ? (
+              <DefaultButton 
+                onClick={handleApply}
+                disabled={isApplying}
+                variant="blue"
+                className="w-full py-3 px-6 rounded-lg"
+              >
+                {isApplying ? t('club.sending') : t('club.joinClub')}
+              </DefaultButton>
+            ) : (
+              <div className="w-full border border-slate-200 bg-slate-50 px-6 py-3 rounded-lg text-left">
+                <p className="text-sm text-slate-500 mb-1">{t('club.applicationStatus')}</p>
+                <p className={`font-bold capitalize
+                  ${applicationStatus === 'pending' ? 'text-amber-600' : 
+                    applicationStatus === 'approved' ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {applicationStatus}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
