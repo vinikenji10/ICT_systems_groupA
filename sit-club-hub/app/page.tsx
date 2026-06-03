@@ -5,12 +5,12 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
 import { useTranslation } from "@/app/contexts/useTranslation";
 import { Club, Category } from "@/app/types";
-import ClubInfoCard from "@/app/components/ClubInfoCard";
+import InfoCard from "@/app/components/InfoCard";
 import SearchWidget from "@/app/components/SearchWidget";
 import CategoryFilter from "@/app/components/CategoryFilter";
 
 export default function DiscoveryPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
@@ -104,11 +104,23 @@ export default function DiscoveryPage() {
               filteredClubs.map((club) => {
                 const clubCategory = dbCategories.find((c) => c.id === club.category);
                 return (
-                  <ClubInfoCard
+                  <InfoCard
                     key={club.id}
-                    club={club}
-                    category={clubCategory}
-                    onCategoryClick={setSelectedCategory}
+                    imageUrl={club.logoUrl}
+                    imageAlt={club.name_en}
+                    tags={club.tags}
+                    categoryName={
+                      clubCategory
+                        ? (lang === 'ja' && clubCategory.name_ja ? clubCategory.name_ja : clubCategory.name_en)
+                        : club.category
+                    }
+                    onCategoryClick={() => setSelectedCategory(club.category)}
+                    titleEn={club.name_en}
+                    titleJa={club.name_ja}
+                    instagramUrl={club.instagramUrl}
+                    descriptionEn={club.description_en}
+                    descriptionJa={club.description_ja}
+                    buttonHref={`/clubs/${club.id}`}
                   />
                 );
               })
