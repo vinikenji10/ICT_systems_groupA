@@ -1,10 +1,28 @@
 {
   "hosting": {
-    "source": "sit-club-hub",
+    "public": "sit-club-hub/out",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/clubs/*",
+        "destination": "/clubs/placeholder/index.html"
+      },
+      {
+        "source": "/dashboard/edit/*",
+        "destination": "/dashboard/edit/placeholder/index.html"
+      },
+      {
+        "source": "/dashboard/events/*",
+        "destination": "/dashboard/events/placeholder/index.html"
+      },
+      {
+        "source": "/dashboard/applications/*",
+        "destination": "/dashboard/applications/placeholder/index.html"
+      }
     ]
   },
   "functions": [

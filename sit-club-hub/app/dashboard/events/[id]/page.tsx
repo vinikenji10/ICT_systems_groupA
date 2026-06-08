@@ -7,7 +7,7 @@ import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { ClubEvent } from '@/app/types';
-import { ADMIN_UIDS } from '@/app/utils/constants';
+import { getAdminUids } from '@/app/utils/constants';
 
 export default function ManageEvents() {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -20,6 +20,7 @@ export default function ManageEvents() {
   const [loading, setLoading] = useState(true);
   const [clubName, setClubName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [adminUids, setAdminUids] = useState<string[]>([]);
 
   // Form states for creating a new event
   const [titleEn, setTitleEn] = useState('');
@@ -34,20 +35,23 @@ export default function ManageEvents() {
   useEffect(() => {
     if (authLoading) return;
 
-    // Security block: Allow access if the user is a leader OR an admin
-    if (!user || (userRole !== 'leader' && !ADMIN_UIDS.includes(user.uid))) {
-      router.push('/');
-      return;
-    }
+    const init = async () => {
+      const uids = await getAdminUids();
+      setAdminUids(uids);
 
-    const fetchEventsAndClub = async () => {
+      // Security block: Allow access if the user is a leader OR an admin
+      if (!user || (userRole !== 'leader' && !uids.includes(user.uid))) {
+        router.push('/');
+        return;
+      }
+
       try {
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
         
         // Check if the user is authorized to manage this specific club
         // Block ONLY if the user is neither a leader of this club NOR an admin
-        if (!clubSnap.exists() || (!clubSnap.data().leaderIds?.includes(user.uid) && !ADMIN_UIDS.includes(user.uid))) {
+        if (!clubSnap.exists() || (!clubSnap.data().leaderIds?.includes(user.uid) && !uids.includes(user.uid))) {
           alert("You are not authorized to manage events for this club.");
           router.push('/dashboard');
           return;
@@ -80,7 +84,7 @@ export default function ManageEvents() {
       }
     };
 
-    fetchEventsAndClub();
+    init();
   }, [user, userRole, authLoading, clubId, router]);
 
   const handleAddEvent = async (e: React.FormEvent) => {

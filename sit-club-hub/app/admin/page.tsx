@@ -7,7 +7,7 @@ import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
-import { ADMIN_UIDS } from '@/app/utils/constants';
+import { getAdminUids } from '@/app/utils/constants';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const [studentUid, setStudentUid] = useState('');
   const [isPromoting, setIsPromoting] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [adminUids, setAdminUids] = useState<string[]>([]);
 
   // Category management states
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
@@ -49,12 +50,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user || !ADMIN_UIDS.includes(user.uid)) {
-      router.push('/');
-      return;
-    }
+    const init = async () => {
+      const uids = await getAdminUids();
+      setAdminUids(uids);
 
-    const fetchAllClubs = async () => {
+      if (!user || !uids.includes(user.uid)) {
+        router.push('/');
+        return;
+      }
+
       try {
         const querySnapshot = await getDocs(collection(db, 'clubs'));
         const allClubs = querySnapshot.docs.map(doc => ({
@@ -77,7 +81,7 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchAllClubs();
+    init();
   }, [user, authLoading, router]);
 
   const getLocalizedCategory = (clubCat: string) => {
@@ -207,7 +211,7 @@ export default function AdminDashboard() {
     return <div className="text-center py-20 text-slate-500 font-medium">{t('admin.verifying')}</div>;
   }
 
-  if (!user || !ADMIN_UIDS.includes(user.uid)) return null;
+  if (!user || !adminUids.includes(user.uid)) return null;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
