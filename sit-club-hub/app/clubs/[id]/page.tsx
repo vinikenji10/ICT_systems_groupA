@@ -8,7 +8,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
-import { ADMIN_UIDS } from '@/app/utils/constants';
+import { getAdminUids } from '@/app/utils/constants';
 import DefaultButton from '@/app/components/DefaultButton';
 
 export default function ClubDetails() {
@@ -28,15 +28,19 @@ export default function ClubDetails() {
   const [hasApplied, setHasApplied] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
+  const [adminUids, setAdminUids] = useState<string[]>([]);
 
   const hasEditPermission = !!(user && club && (
-    ADMIN_UIDS.includes(user.uid) || 
+    adminUids.includes(user.uid) || 
     club.leaderIds?.includes(user.uid)
   ));
 
   useEffect(() => {
     const fetchClubAndCategories = async () => {
       try {
+        const uids = await getAdminUids();
+        setAdminUids(uids);
+
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
 
