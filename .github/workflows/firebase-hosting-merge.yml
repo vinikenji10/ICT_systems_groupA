@@ -32,9 +32,10 @@ jobs:
         run: npm run build
         working-directory: ./sit-club-hub
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ICT_SYSTEMS_PROJECT_A }}
-          channelId: live
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ICT_SYSTEMS_PROJECT_A }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > "$HOME/service-account.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/service-account.json"
+          npx firebase-tools@latest deploy --only hosting

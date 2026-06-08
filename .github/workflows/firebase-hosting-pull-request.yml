@@ -31,9 +31,4 @@ jobs:
         run: npm run build
         working-directory: ./sit-club-hub
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ICT_SYSTEMS_PROJECT_A }}
-          channelId: preview
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+
