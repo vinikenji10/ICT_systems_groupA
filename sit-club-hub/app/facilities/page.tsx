@@ -19,6 +19,10 @@ export interface Building {
   floors_ja: string;
   established?: string;
   features: string[];
+  weekdays_en?: string;
+  weekdays_ja?: string;
+  hours_en?: string;
+  hours_ja?: string;
 }
 
 export const DEFAULT_BUILDINGS: Building[] = [
@@ -612,8 +616,6 @@ export default function FacilitiesPage() {
               tags={building.features}
               titleEn={building.name_en}
               titleJa={building.name_ja}
-              descriptionEn={building.description_en}
-              descriptionJa={building.description_ja}
               buttonHref={`/facilities/${building.id}`}
               buttonText={lang === 'ja' ? '詳細を見る' : 'View Details'}
             />
