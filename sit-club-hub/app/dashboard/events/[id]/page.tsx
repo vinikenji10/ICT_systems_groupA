@@ -9,10 +9,6 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { ClubEvent } from '@/app/types';
 import { getAdminUids } from '@/app/utils/constants';
 
-export function generateStaticParams() {
-  return [{ id: 'placeholder' }];
-}
-
 export default function ManageEvents() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();

@@ -10,10 +10,6 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import type { TranslationKey } from '@/app/contexts/translations';
 import { getAdminUids } from '@/app/utils/constants';
 
-export function generateStaticParams() {
-  return [];
-}
-
 export default function EditClub() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();

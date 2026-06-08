@@ -10,9 +10,6 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
 import { getAdminUids } from '@/app/utils/constants';
 
-export function generateStaticParams() {
-  return [{ id: 'placeholder' }];
-}
 import DefaultButton from '@/app/components/DefaultButton';
 
 export default function ClubDetails() {
