@@ -8,6 +8,10 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Application } from '@/app/types';
 
+export function generateStaticParams() {
+  return [{ id: 'placeholder' }];
+}
+
 export default function ManageApplications() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
