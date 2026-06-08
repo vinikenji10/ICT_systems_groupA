@@ -8,7 +8,7 @@ import { db, storage } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import type { TranslationKey } from '@/app/contexts/translations';
-import { ADMIN_UIDS } from '@/app/utils/constants';
+import { getAdminUids } from '@/app/utils/constants';
 
 export default function EditClub() {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -54,17 +54,21 @@ export default function EditClub() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [headerName, setHeaderName] = useState(''); // Keep original name for header
+  const [adminUids, setAdminUids] = useState<string[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
 
-    // Allow access if user is leader OR an admin
-    if (!user || (userRole !== 'leader' && !ADMIN_UIDS.includes(user.uid))) {
-      router.push('/');
-      return;
-    }
+    const init = async () => {
+      const uids = await getAdminUids();
+      setAdminUids(uids);
 
-    const fetchClubData = async () => {
+      // Allow access if user is leader OR an admin
+      if (!user || (userRole !== 'leader' && !uids.includes(user.uid))) {
+        router.push('/');
+        return;
+      }
+
       try {
         const clubRef = doc(db, 'clubs', clubId);
         const clubSnap = await getDoc(clubRef);
@@ -73,7 +77,7 @@ export default function EditClub() {
           const data = clubSnap.data();
           
           // Block ONLY if user is not a leader AND not an admin
-          if (!data.leaderIds?.includes(user.uid) && !ADMIN_UIDS.includes(user.uid)) {
+          if (!data.leaderIds?.includes(user.uid) && !uids.includes(user.uid)) {
             alert("You are not authorized to edit this club.");
             router.push('/dashboard');
             return;
@@ -122,7 +126,7 @@ export default function EditClub() {
       }
     };
 
-    fetchClubData();
+    init();
   }, [user, userRole, authLoading, clubId, router]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,7 +192,7 @@ export default function EditClub() {
 
       alert("Club information saved successfully!");
       // Redirect Admins back to Admin panel, Leaders to Dashboard
-      if (ADMIN_UIDS.includes(user?.uid || '')) {
+      if (adminUids.includes(user?.uid || '')) {
         router.push('/admin');
       } else {
         router.push('/dashboard');
@@ -202,7 +206,7 @@ export default function EditClub() {
   };
 
   const handleDeleteClub = async () => {
-    if (!ADMIN_UIDS.includes(user?.uid || '')) {
+    if (!adminUids.includes(user?.uid || '')) {
       alert("You are not authorized to delete this club.");
       return;
     }
@@ -243,7 +247,7 @@ export default function EditClub() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-primary">{t('edit.title', { name: headerName })}</h1>
         <button 
-          onClick={() => ADMIN_UIDS.includes(user?.uid || '') ? router.push('/admin') : router.push('/dashboard')}
+          onClick={() => adminUids.includes(user?.uid || '') ? router.push('/admin') : router.push('/dashboard')}
           className="text-slate-500 hover:text-dark font-medium"
         >
           &larr; {t('edit.back')}
@@ -345,7 +349,7 @@ export default function EditClub() {
           </button>
         </div>
 
-        {ADMIN_UIDS.includes(user?.uid || '') && (
+        {adminUids.includes(user?.uid || '') && (
           <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 space-y-4">
             <h2 className="text-xl font-bold text-red-800">Danger Zone</h2>
             <p className="text-sm text-red-700">Permanently delete this club and all associated events, applications, and data. This cannot be undone.</p>

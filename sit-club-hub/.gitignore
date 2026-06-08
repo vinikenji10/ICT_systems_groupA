@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Secure Firebase Config
-/app/firebase/config.ts
+# /app/firebase/config.ts
 
 # admin UIDS
-/app/utils/constants.ts
+# /app/utils/constants.ts
