@@ -8,7 +8,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
-import { ADMIN_UIDS } from '@/app/utils/constants';
+import { ADMIN_UIDS } from '@/app/utils/constants'; 
 import DefaultButton from '@/app/components/DefaultButton';
 
 export default function ClubDetails() {
