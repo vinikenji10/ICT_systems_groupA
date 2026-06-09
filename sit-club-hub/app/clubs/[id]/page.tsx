@@ -29,10 +29,20 @@ export default function ClubDetails() {
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
 
+  // Review states
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [newReviewText, setNewReviewText] = useState('');
+  const [newRating, setNewRating] = useState(5);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
   const hasEditPermission = !!(user && club && (
     ADMIN_UIDS.includes(user.uid) || 
     club.leaderIds?.includes(user.uid)
   ));
+
+  const makeStars = (rating: number) => {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  };
 
   useEffect(() => {
     const fetchClubAndCategories = async () => {
@@ -54,6 +64,16 @@ export default function ClubDetails() {
           ...doc.data()
         })) as Category[];
         setCategories(categoriesData);
+
+        const reviewsSnapshot = await getDocs(collection(db, 'clubs', clubId, 'reviews'));
+        const reviewsData = reviewsSnapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter((review: any) => review.isVisible !== false);
+
+        setReviews(reviewsData);
       } catch (error) {
         console.error("Error fetching club details:", error);
       } finally {
@@ -124,6 +144,53 @@ export default function ClubDetails() {
       alert("Failed to send application. Please try again.");
     } finally {
       setIsApplying(false);
+    }
+  };
+
+  const handleAddReview = async () => {
+    if (!user) {
+      alert("Please sign in to write a review.");
+      return;
+    }
+
+    if (!newReviewText.trim()) {
+      alert("Please write a review.");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      const reviewData = {
+        rating: newRating,
+        ratingStars: makeStars(newRating),
+        review_en: displayLang === 'en' ? newReviewText : '',
+        review_ja: displayLang === 'ja' ? newReviewText : '',
+        reviewerType: 'student',
+        reviewerName: user.email || 'Anonymous',
+        year: 'Student',
+        isVisible: true,
+        createdAt: serverTimestamp()
+      };
+
+      const reviewRef = await addDoc(collection(db, 'clubs', clubId, 'reviews'), reviewData);
+
+      setReviews([
+        ...reviews,
+        {
+          id: reviewRef.id,
+          ...reviewData
+        }
+      ]);
+
+      setNewReviewText('');
+      setNewRating(5);
+      alert("Review submitted successfully!");
+    } catch (error) {
+      console.error("Error adding review:", error);
+      alert("Failed to submit review. Please try again.");
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -303,6 +370,80 @@ export default function ClubDetails() {
             <span className="text-slate-600">{club[`payment_${displayLang}`] || '-'}</span>
           </div>
 
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+        <h3 className="font-bold text-xl text-dark mb-6">
+          {displayLang === 'en' ? 'Senior Reviews' : '先輩レビュー'}
+        </h3>
+
+        <div className="space-y-4 mb-8">
+          {reviews.length === 0 ? (
+            <p className="text-slate-500">
+              {displayLang === 'en' ? 'No reviews yet.' : 'まだレビューがありません。'}
+            </p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-yellow-500 text-lg font-bold">
+                    {review.ratingStars || makeStars(review.rating || 0)}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {review.year || ''}
+                  </span>
+                </div>
+
+                <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                  {displayLang === 'en'
+                    ? (review.review_en || review.review_ja || '-')
+                    : (review.review_ja || review.review_en || '-')}
+                </p>
+
+                <p className="text-xs text-slate-400 mt-2">
+                  {review.reviewerName || 'Anonymous'} · {review.reviewerType || 'student'}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="border-t border-slate-200 pt-6">
+          <h4 className="font-bold text-dark mb-3">
+            {displayLang === 'en' ? 'Write a Review' : 'レビューを書く'}
+          </h4>
+
+          <select
+            value={newRating}
+            onChange={(e) => setNewRating(Number(e.target.value))}
+            className="border border-slate-300 rounded-md px-3 py-2 mb-3 text-sm"
+          >
+            <option value={5}>★★★★★ 5</option>
+            <option value={4}>★★★★☆ 4</option>
+            <option value={3}>★★★☆☆ 3</option>
+            <option value={2}>★★☆☆☆ 2</option>
+            <option value={1}>★☆☆☆☆ 1</option>
+          </select>
+
+          <textarea
+            value={newReviewText}
+            onChange={(e) => setNewReviewText(e.target.value)}
+            placeholder={displayLang === 'en' ? 'Write your review here.' : 'ここにレビューを書いてください。'}
+            className="w-full border border-slate-300 rounded-lg p-3 text-sm min-h-[100px] mb-3"
+          />
+
+          <DefaultButton
+            onClick={handleAddReview}
+            disabled={isSubmittingReview}
+            variant="blue"
+            className="px-5 rounded-lg"
+          >
+            {isSubmittingReview
+              ? (displayLang === 'en' ? 'Submitting...' : '送信中...')
+              : (displayLang === 'en' ? 'Submit Review' : 'レビューを送信')}
+          </DefaultButton>
         </div>
       </div>
 
