@@ -14,6 +14,7 @@ export default function CampusEvents() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
     const fetchAllEvents = async () => {
       try {
         const clubsRef = collection(db, 'clubs');
@@ -50,7 +51,6 @@ export default function CampusEvents() {
               category: clubMap[data.clubId]?.category || 'General',
               title_en: data.title_en,
               title_ja: data.title_ja,
-              // Fallback para suportar o formato antigo caso o banco não tenha sido atualizado ainda
               location_en: data.location_en || data.location || 'TBD',
               location_ja: data.location_ja || data.location || 'TBD',
               startTime: data.startTime.toDate(),
@@ -71,10 +71,8 @@ export default function CampusEvents() {
     fetchAllEvents();
   }, []);
 
-
-
   if (loading) {
-    return <div className="text-center py-20 text-slate-500">{t('events.loading')}</div>;
+    return <div className="text-center py-20 text-emerald-50">{t('events.loading')}</div>;
   }
 
   return (

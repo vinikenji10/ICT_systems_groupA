@@ -17,7 +17,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" prefetch={false} className="flex items-center gap-3">
               <img 
                 src="https://firebasestorage.googleapis.com/v0/b/ict-systems-project-a.firebasestorage.app/o/Assets%2Fshibaura_logo.png?alt=media&token=0710c303-5f80-4d8a-87b9-ed45dc3d70e9" 
                 alt="SIT Logo" 
@@ -29,20 +29,20 @@ export default function Navbar() {
 
           {/* Navigation Links */}
           <div className="hidden md:flex space-x-8 items-center">
-            <Link href="/" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/" prefetch={false} className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.discovery')}
             </Link>
-            <Link href="/events" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/events" prefetch={false} className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.events')}
             </Link>
-            <Link href="/facilities" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/facilities" prefetch={false} className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.facilities')}
             </Link>
-            <Link href="/schedule" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+            <Link href="/schedule" prefetch={false} className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
               {t('nav.planner')}
             </Link>
             {userRole === 'leader' && (
-              <Link href="/dashboard" className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+              <Link href="/dashboard" prefetch={false} className="text-slate-600 hover:text-blue-600 font-medium transition-colors">
                 {t('nav.leaderPortal')}
               </Link>
             )}

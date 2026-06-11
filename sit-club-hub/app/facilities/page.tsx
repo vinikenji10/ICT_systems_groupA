@@ -19,6 +19,7 @@ export default function FacilitiesPage() {
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
 
   useEffect(() => {
+
     const fetchFacilities = async () => {
       try {
         const snapshot = await getDocs(collection(db, 'facilities'));

@@ -9,7 +9,7 @@ export const translations = {
     'nav.signOut': 'Sign Out',
     'nav.signIn': 'Sign In',
 
-    'discovery.title': 'Discover Hidden Communities',
+    'discovery.title': 'Discover Student Communities',
     'discovery.subtitle': 'Find your passion and join student organizations.',
     'discovery.search': 'Search clubs, sports, tags...',
     'discovery.categories': 'Categories',
