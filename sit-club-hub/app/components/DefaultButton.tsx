@@ -9,7 +9,7 @@ interface DefaultButtonProps {
   className?: string;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
-  variant?: "dark" | "blue" | "light" | "outline";
+  variant?: "dark" | "blue" | "primary" | "light" | "outline";
   href?: string;
 }
 
@@ -25,6 +25,7 @@ export default function DefaultButton({
   const variantStyles = {
     dark: "bg-[#121824] hover:bg-slate-800 disabled:bg-slate-400 text-white",
     blue: "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white shadow-sm",
+    primary: "bg-[#0f4e3c] hover:bg-primary disabled:opacity-50 text-white shadow-sm",
     light: "bg-slate-100 hover:bg-slate-200 disabled:bg-slate-50 text-slate-700 border border-transparent",
     outline: "bg-transparent hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-50",
   }[variant];
