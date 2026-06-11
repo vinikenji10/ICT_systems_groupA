@@ -28,8 +28,8 @@ export default function EventCard({ event, category }: EventCardProps) {
   const eventLocation = lang === 'ja' && event.location_ja ? event.location_ja : event.location_en;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-      <div className="bg-primary text-white px-5 py-3 flex justify-between items-center">
+    <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90">
+      <div className="bg-primary/90 backdrop-blur-sm text-white px-5 py-3 flex justify-between items-center border-b border-white/20">
         <span className="font-bold tracking-wide">{dateString}</span>
         <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
           {categoryName}

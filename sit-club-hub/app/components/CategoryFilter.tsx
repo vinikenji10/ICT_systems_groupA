@@ -17,7 +17,7 @@ export default function CategoryFilter({
   const { t, lang } = useTranslation();
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-md space-y-4">
+    <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl p-6 shadow-xl space-y-4">
       <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-2">
         {t('discovery.categories')}
       </h3>
@@ -27,8 +27,8 @@ export default function CategoryFilter({
           onClick={() => onSelectCategory("All")}
           className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm cursor-pointer ${
             selectedCategory === "All"
-              ? "bg-background text-foreground shadow-sm"
-              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              ? "bg-primary/90 text-white shadow-md backdrop-blur-sm"
+              : "text-slate-600 hover:bg-white/60 hover:text-slate-900"
           }`}
         >
           {t('discovery.catAll')}
@@ -39,8 +39,8 @@ export default function CategoryFilter({
             onClick={() => onSelectCategory(category.id)}
             className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm cursor-pointer ${
               selectedCategory === category.id
-                ? "bg-background text-foreground shadow-sm"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                ? "bg-primary/90 text-white shadow-md backdrop-blur-sm"
+                : "text-slate-600 hover:bg-white/60 hover:text-slate-900"
             }`}
           >
             {lang === 'ja' && category.name_ja ? category.name_ja : category.name_en}

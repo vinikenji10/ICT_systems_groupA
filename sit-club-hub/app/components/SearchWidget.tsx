@@ -17,7 +17,7 @@ export default function SearchWidget({ value, onChange }: SearchWidgetProps) {
         placeholder={t('discovery.search')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium bg-slate-50 text-slate-800 placeholder-slate-400"
+        className="w-full px-5 py-3.5 rounded-2xl border border-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium bg-white/50 backdrop-blur-md text-slate-800 placeholder-slate-500 shadow-inner transition-all hover:bg-white/60 focus:bg-white/80"
       />
     </div>
   );

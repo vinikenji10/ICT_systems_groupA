@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main # Change to 'master' if your repository still uses the old default branch name
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Next.js
+    runs-on: ubuntu-latest
+
+    # Tells GitHub Actions that ALL subsequent "run" commands must execute inside your subfolder
+    defaults:
+      run:
+        working-directory: ./sit-club-hub
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24 # Replace with the Node version you found on your local machine
+          cache: 'npm'
+          # Points the cache manager to the correct lockfile location inside the subfolder
+          cache-dependency-path: ./sit-club-hub/package-lock.json 
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Application
+        run: npm run build
+
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+          # Tells this specific Action where to find the firebase.json file
+          PROJECT_PATH: ./sit-club-hub 
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}

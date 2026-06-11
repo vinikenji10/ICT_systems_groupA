@@ -21,7 +21,7 @@ export default function ClubInfoCard({ club, category, onCategoryClick }: ClubIn
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col group transition-all hover:shadow-xl hover:-translate-y-1"
+      className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90"
     >
       <ClubLogo logoUrl={club.logoUrl} name={club.name_en} />
 
