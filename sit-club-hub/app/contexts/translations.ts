@@ -1,6 +1,6 @@
 export const translations = {
   en: {
-    'nav.clubHub': 'Club Hub',
+    'nav.clubHub': 'SIT Club Hub',
     'nav.discovery': 'Discovery',
     'nav.events': 'Events',
     'nav.facilities': 'Facilities',
@@ -165,7 +165,7 @@ export const translations = {
     'edit.loading': 'Loading editor...',
   },
   ja: {
-    'nav.clubHub': '課外活動一覧',
+    'nav.clubHub': 'SIT課外活動一覧',
     'nav.discovery': '探索',
     'nav.events': 'イベント',
     'nav.facilities': '施設案内',
