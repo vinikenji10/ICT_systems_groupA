@@ -216,7 +216,7 @@ function ClubDetailsContent() {
         <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
           {club.logoUrl ? (
             <Image
-              src={club.logoUrl}
+              src={club.logoUrl.includes('shibaura_logo.png') ? '/shibaura_logo.png' : club.logoUrl}
               alt={`Banner of ${club.name_en}`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
