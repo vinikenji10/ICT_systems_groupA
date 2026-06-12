@@ -14,6 +14,7 @@ export default function Navbar() {
   const { t } = useTranslation();
 
   const [hoveredRect, setHoveredRect] = useState({ left: 0, width: 0, opacity: 0 });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -129,14 +130,79 @@ export default function Navbar() {
               <DefaultButton 
                 href="/login"
                 variant="primary"
-                className="px-4 py-2 rounded-md text-sm font-medium"
+                className="px-4 py-2 rounded-md text-sm font-medium hidden sm:block"
               >
                 {t('nav.signIn')}
               </DefaultButton>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900 focus:outline-none"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
 
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden py-4 border-t border-slate-100 flex flex-col space-y-4 animate-in slide-in-from-top-2 fade-in duration-200">
+            <Link 
+              href="/" 
+              prefetch={false}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+            >
+              {t('nav.discovery')}
+            </Link>
+            <Link 
+              href="/events" 
+              prefetch={false}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+            >
+              {t('nav.events')}
+            </Link>
+            <Link 
+              href="/facilities" 
+              prefetch={false}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+            >
+              {t('nav.facilities')}
+            </Link>
+            {userRole === 'leader' && (
+              <Link 
+                href="/dashboard" 
+                prefetch={false}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+              >
+                {t('nav.leaderPortal')}
+              </Link>
+            )}
+            {!user && (
+              <Link 
+                href="/login" 
+                prefetch={false}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-primary font-bold px-2 pt-3 mt-2 border-t border-slate-100 sm:hidden"
+              >
+                {t('nav.signIn')}
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );
