@@ -41,3 +41,4 @@ jobs:
           PROJECT_PATH: ./sit-club-hub 
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
