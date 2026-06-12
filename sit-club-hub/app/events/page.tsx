@@ -13,12 +13,20 @@ export default function CampusEvents() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper to force a timeout on hanging Promises
+  const fetchWithTimeout = async <T,>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+    ]);
+  };
+
   useEffect(() => {
 
     const fetchAllEvents = async () => {
       try {
         const clubsRef = collection(db, 'clubs');
-        const clubsSnapshot = await getDocs(clubsRef);
+        const clubsSnapshot = await fetchWithTimeout(getDocs(clubsRef));
         
         const clubMap: Record<string, { name: string; category: string }> = {};
         clubsSnapshot.docs.forEach(doc => {
@@ -29,7 +37,7 @@ export default function CampusEvents() {
           };
         });
 
-        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesSnapshot = await fetchWithTimeout(getDocs(collection(db, 'categories')));
         const categoriesData = categoriesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -37,7 +45,7 @@ export default function CampusEvents() {
         setCategories(categoriesData);
 
         const eventsRef = collection(db, 'events');
-        const eventsSnapshot = await getDocs(eventsRef);
+        const eventsSnapshot = await fetchWithTimeout(getDocs(eventsRef));
 
         const allEventsData: CampusEvent[] = [];
 
@@ -63,6 +71,9 @@ export default function CampusEvents() {
         setEvents(allEventsData);
       } catch (error) {
         console.error("Error fetching campus events:", error);
+        if (error instanceof Error && error.message === "timeout") {
+          window.location.reload();
+        }
       } finally {
         setLoading(false);
       }

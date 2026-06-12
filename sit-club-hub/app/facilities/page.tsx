@@ -19,11 +19,19 @@ export default function FacilitiesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
 
+  // Helper to force a timeout on hanging Promises
+  const fetchWithTimeout = async <T,>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+    ]);
+  };
+
   useEffect(() => {
 
     const fetchFacilities = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'facilities'));
+        const snapshot = await fetchWithTimeout(getDocs(collection(db, 'facilities')));
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -43,6 +51,9 @@ export default function FacilitiesPage() {
 
       } catch (error) {
         console.error("Error fetching facilities:", error);
+        if (error instanceof Error && error.message === "timeout") {
+          window.location.reload();
+        }
       } finally {
         setLoading(false);
       }

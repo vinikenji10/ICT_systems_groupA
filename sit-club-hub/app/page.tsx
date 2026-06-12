@@ -19,16 +19,24 @@ export default function DiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  // Helper to force a timeout on hanging Promises
+  const fetchWithTimeout = async <T,>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+    ]);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const clubsSnapshot = await getDocs(collection(db, "clubs"));
+        const clubsSnapshot = await fetchWithTimeout(getDocs(collection(db, "clubs")));
         const clubsData = clubsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Club[];
 
-        const categoriesSnapshot = await getDocs(collection(db, "categories"));
+        const categoriesSnapshot = await fetchWithTimeout(getDocs(collection(db, "categories")));
         const categoriesData = categoriesSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -39,6 +47,10 @@ export default function DiscoveryPage() {
         setDbCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching data:", error);
+        if (error instanceof Error && error.message === "timeout") {
+          // If the Firebase WebSocket hung, automate the reload to fix it
+          window.location.reload();
+        }
       } finally {
         setLoading(false);
       }
