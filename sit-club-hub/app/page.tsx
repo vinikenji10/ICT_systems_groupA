@@ -71,13 +71,7 @@ export default function DiscoveryPage() {
     setFilteredClubs(result);
   }, [searchQuery, selectedCategory, clubs, dbCategories]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0d4f37] flex items-center justify-center text-emerald-50 text-lg">
-        {t('discovery.loading')}
-      </div>
-    );
-  }
+
 
   return (
     <div className="relative w-full flex flex-col items-center">
@@ -112,7 +106,11 @@ export default function DiscoveryPage() {
           </div>
 
           <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredClubs.length > 0 ? (
+            {loading ? (
+              <div className="col-span-full text-center py-20 text-emerald-100 font-medium backdrop-blur-md bg-white/5 rounded-3xl border border-white/10 shadow-inner animate-pulse">
+                {t('discovery.loading')}
+              </div>
+            ) : filteredClubs.length > 0 ? (
               filteredClubs.map((club) => {
                 const clubCategory = dbCategories.find((c) => c.id === club.category);
                 return (

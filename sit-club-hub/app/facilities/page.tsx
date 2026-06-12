@@ -7,6 +7,7 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { Facility, Category } from '@/app/types';
 import SearchWidget from "@/app/components/SearchWidget";
 import CategoryFilter from "@/app/components/CategoryFilter";
+import Image from "next/image";
 
 export default function FacilitiesPage() {
   const { t, lang } = useTranslation();
@@ -74,9 +75,7 @@ export default function FacilitiesPage() {
     setFilteredFacilities(result);
   }, [searchQuery, selectedCategory, facilities]);
 
-  if (loading) {
-    return <div className="text-center py-20 text-emerald-50 text-lg">{t('facilities.loading')}</div>;
-  }
+
 
   return (
     <div className="relative w-full flex flex-col items-center">
@@ -109,7 +108,11 @@ export default function FacilitiesPage() {
           </div>
 
           <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFacilities.length === 0 ? (
+            {loading ? (
+              <div className="col-span-full py-12 text-center backdrop-blur-md bg-white/5 rounded-3xl border border-white/10 shadow-inner animate-pulse">
+                <p className="text-emerald-100 font-medium">{t('facilities.loading')}</p>
+              </div>
+            ) : filteredFacilities.length === 0 ? (
               <div className="col-span-full py-12 text-center backdrop-blur-md bg-white/5 rounded-3xl border border-white/10 shadow-inner">
                 <p className="text-emerald-100 font-medium">{t('facilities.noFacilities')}</p>
               </div>
@@ -117,11 +120,14 @@ export default function FacilitiesPage() {
               filteredFacilities.map((facility) => (
                 <div key={facility.id} className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90">
                   {facility.imageUrl && (
-                    <div className="h-44 w-full bg-slate-100 overflow-hidden shrink-0">
-                      <img
+                    <div className="h-44 w-full bg-slate-100 overflow-hidden shrink-0 relative">
+                      <Image
                         src={facility.imageUrl}
                         alt={lang === 'ja' ? facility.name_ja : facility.name_en}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                        unoptimized={true}
                       />
                     </div>
                   )}

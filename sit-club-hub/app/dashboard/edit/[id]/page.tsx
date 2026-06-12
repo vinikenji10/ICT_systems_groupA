@@ -9,6 +9,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import type { TranslationKey } from '@/app/contexts/translations';
 import { ADMIN_UIDS } from '@/app/utils/constants';
+import Image from 'next/image';
 
 export default function EditClub() {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -269,9 +270,15 @@ export default function EditClub() {
 
           <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
             <div className="shrink-0">
-              <div className="h-24 w-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-slate-200 flex items-center justify-center">
+              <div className="h-24 w-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-slate-200 flex items-center justify-center relative">
                 {(imagePreview || logoUrl) ? (
-                  <img src={imagePreview || logoUrl} alt="Club Logo" className="h-full w-full object-cover"/>
+                  <Image 
+                    src={imagePreview || logoUrl} 
+                    alt="Club Logo" 
+                    fill
+                    className="object-cover"
+                    unoptimized={!!imagePreview}
+                  />
                 ) : (
                   <span className="text-slate-400 text-xs">{t('edit.noLogo')}</span>
                 )}

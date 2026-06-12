@@ -10,6 +10,7 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 import DefaultButton from '@/app/components/DefaultButton';
+import Image from 'next/image';
 
 export default function ClubDetails() {
   const { user, loading: authLoading } = useAuth();
@@ -214,10 +215,12 @@ export default function ClubDetails() {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
           {club.logoUrl ? (
-            <img
+            <Image
               src={club.logoUrl}
               alt={`Banner of ${club.name_en}`}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
             />
           ) : (
             <span className="text-slate-400 font-medium">{t('club.bannerPlaceholder')}</span>
