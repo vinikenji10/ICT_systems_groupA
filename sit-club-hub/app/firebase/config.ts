@@ -16,14 +16,7 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 const auth = getAuth(app);
-let db: Firestore;
-try {
-  db = initializeFirestore(app, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-  });
-} catch (e) {
-  db = getFirestore(app);
-}
+const db = getFirestore(app);
 const storage = getStorage(app);
 
 export { app, auth, db, storage };
