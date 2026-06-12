@@ -75,7 +75,7 @@ export default function CampusEvents() {
   }
 
   return (
-    <div className="relative w-full flex flex-col items-center">
+    <div className="relative w-full flex flex-col items-center max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Full bleed fixed background to break out of layout constraints */}
       <div className="fixed inset-0 bg-[#0d4f37] z-0 pointer-events-none" />
       

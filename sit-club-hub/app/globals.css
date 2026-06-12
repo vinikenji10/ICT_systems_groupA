@@ -18,8 +18,6 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-roboto), var(--font-noto-sans-jp), Arial, Helvetica, sans-serif;
 }
 
@@ -34,4 +32,99 @@ input::placeholder,
 textarea::placeholder {
   color: #94a3b8; 
   opacity: 1; 
+}
+/* Landing Page Card Styles */
+:root {
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 64px;
+  --text-light: rgba(255,255,255,0.75);
+  --text-lighter: rgba(255,255,255,0.9);
+  --width-container: 1200px;
+}
+
+.card-grid{
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-column-gap: var(--spacing-l);
+  grid-row-gap: var(--spacing-l);
+  max-width: var(--width-container);
+  width: 100%;
+}
+
+@media(min-width: 540px){
+  .card-grid{
+    grid-template-columns: repeat(2, 1fr); 
+  }
+}
+
+@media(min-width: 960px){
+  .card-grid{
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
+.card{
+  list-style: none;
+  position: relative;
+  border-radius: var(--spacing-l);
+  overflow: hidden;
+}
+
+.card:before{
+  content: '';
+  display: block;
+  padding-bottom: 150%;
+  width: 100%;
+}
+
+.card__background{
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--spacing-l);
+  bottom: 0;
+  filter: brightness(0.75) saturate(1.2) contrast(0.85);
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform-origin: center;
+  transform: scale(1) translateZ(0);
+  transition: 
+    filter 200ms linear,
+    transform 200ms linear;
+}
+
+.card:hover .card__background{
+  transform: scale(1.05) translateZ(0);
+}
+
+.card-grid:hover > .card:not(:hover) .card__background{
+  filter: brightness(0.5) saturate(0.5) contrast(1.2) blur(10px);
+}
+
+.card__content{
+  left: 0;
+  padding: var(--spacing-l);
+  position: absolute;
+  top: 0;
+}
+
+.card__category{
+  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-m);
+  text-transform: uppercase;
+  text-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+}
+
+.card__heading{
+  color: var(--text-lighter);
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 20px rgba(0,0,0,0.5);
+  line-height: 1.2;
 }

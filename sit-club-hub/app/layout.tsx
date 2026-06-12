@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${roboto.variable} ${notoSansJP.variable} font-sans bg-slate-50 min-h-screen flex flex-col text-slate-900`}>
         <LanguageProvider>
           <Navbar />
-          <main className="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <main className="flex-grow w-full">
             {children}
           </main>
         </LanguageProvider>
