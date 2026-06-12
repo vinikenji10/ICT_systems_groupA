@@ -21,7 +21,7 @@ export default function ClubInfoCard({ club, category, onCategoryClick }: ClubIn
 
   return (
     <div
-      className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90"
+      className="bg-white/80 backdrop-blur-md border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90"
     >
       <ClubLogo logoUrl={club.logoUrl} name={club.name_en} />
 
@@ -40,7 +40,7 @@ export default function ClubInfoCard({ club, category, onCategoryClick }: ClubIn
         />
 
         <DefaultButton
-          onClick={() => router.push(`/clubs/${club.id}`)}
+          onClick={() => router.push(`/club?id=${club.id}`)}
           className="w-full mt-auto"
         >
           {t('discovery.viewDetails')}

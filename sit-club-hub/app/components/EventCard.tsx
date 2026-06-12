@@ -28,7 +28,7 @@ export default function EventCard({ event, category }: EventCardProps) {
   const eventLocation = lang === 'ja' && event.location_ja ? event.location_ja : event.location_en;
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90">
+    <div className="bg-white/80 backdrop-blur-md border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90">
       <div className="bg-primary/90 backdrop-blur-sm text-white px-5 py-3 flex justify-between items-center border-b border-white/20">
         <span className="font-bold tracking-wide">{dateString}</span>
         <span className="text-sm font-medium bg-white/20 px-2 py-0.5 rounded text-white">
@@ -55,7 +55,7 @@ export default function EventCard({ event, category }: EventCardProps) {
             <span className="w-5 font-bold">🏢</span>
             <span 
               className="font-medium text-primary hover:underline cursor-pointer" 
-              onClick={() => router.push(`/clubs/${event.clubId}`)}
+              onClick={() => router.push(`/club?id=${event.clubId}`)}
             >
               {event.clubName}
             </span>
@@ -63,7 +63,7 @@ export default function EventCard({ event, category }: EventCardProps) {
         </div>
 
         <DefaultButton 
-          onClick={() => router.push(`/clubs/${event.clubId}`)}
+          onClick={() => router.push(`/club?id=${event.clubId}`)}
           variant="light"
           className="w-full mt-auto rounded-lg text-sm py-2.5 font-semibold"
         >

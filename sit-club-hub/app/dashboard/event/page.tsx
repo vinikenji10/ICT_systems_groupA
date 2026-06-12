@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, getDoc, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -9,12 +9,12 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { ClubEvent } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 
-export default function ManageEvents() {
+function ManageEventsContent() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
-  const params = useParams();
-  const clubId = params.id as string; 
+  const searchParams = useSearchParams();
+  const clubId = searchParams.get('id') as string; 
   
   const [events, setEvents] = useState<ClubEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -214,5 +214,13 @@ export default function ManageEvents() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ManageEvents() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-slate-500">Loading...</div>}>
+      <ManageEventsContent />
+    </Suspense>
   );
 }

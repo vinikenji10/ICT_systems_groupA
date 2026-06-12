@@ -104,19 +104,19 @@ export default function LeaderDashboard() {
               
               <div className="mt-auto pt-6 flex gap-3">
                 <button 
-                  onClick={() => router.push(`/dashboard/edit/${club.id}`)}
+                  onClick={() => router.push(`/dashboard/edit-club?id=${club.id}`)}
                   className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm font-semibold transition-colors"
                 >
                   {t('dashboard.editProfile')}
                 </button>
                 <button
-                  onClick={() => router.push(`/dashboard/events/${club.id}`)}
+                  onClick={() => router.push(`/dashboard/event?id=${club.id}`)}
                   className="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 py-2 rounded-lg text-sm font-semibold transition-colors"
                 >
                   {t('dashboard.events')}
                 </button>
                 <button
-                  onClick={() => router.push(`/dashboard/applications/${club.id}`)}
+                  onClick={() => router.push(`/dashboard/application?id=${club.id}`)}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
                 >
                   {t('dashboard.apps')}

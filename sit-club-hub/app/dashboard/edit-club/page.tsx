@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc, updateDoc, collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/app/firebase/config';
@@ -11,12 +11,12 @@ import type { TranslationKey } from '@/app/contexts/translations';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 import Image from 'next/image';
 
-export default function EditClub() {
+function EditClubContent() {
   const { user, userRole, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
-  const params = useParams();
-  const clubId = params.id as string;
+  const searchParams = useSearchParams();
+  const clubId = searchParams.get('id') as string;
 
   // Club Name states
   const [nameEn, setNameEn] = useState('');
@@ -369,5 +369,13 @@ export default function EditClub() {
 
       </form>
     </div>
+  );
+}
+
+export default function EditClub() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-slate-500">Loading...</div>}>
+      <EditClubContent />
+    </Suspense>
   );
 }

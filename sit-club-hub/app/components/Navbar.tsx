@@ -40,7 +40,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/" prefetch={false} className="flex items-center gap-3">
               <Image 
-                src="https://firebasestorage.googleapis.com/v0/b/ict-systems-project-a.firebasestorage.app/o/Assets%2Fshibaura_logo.png?alt=media&token=0710c303-5f80-4d8a-87b9-ed45dc3d70e9" 
+                src="/shibaura_logo.png" 
                 alt="SIT Logo" 
                 width={40}
                 height={40}

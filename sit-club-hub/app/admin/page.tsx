@@ -166,7 +166,7 @@ export default function AdminDashboard() {
       };
 
       const docRef = await addDoc(collection(db, 'clubs'), newClubDraft);
-      router.push(`/dashboard/edit/${docRef.id}`);
+      router.push(`/dashboard/edit-club?id=${docRef.id}`);
     } catch (error) {
       console.error("Error creating draft club:", error);
       alert("Failed to create new club.");
@@ -299,13 +299,13 @@ export default function AdminDashboard() {
                 {/* Updated Action Buttons Container */}
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => router.push(`/dashboard/events/${club.id}`)}
+                    onClick={() => router.push(`/dashboard/event?id=${club.id}`)}
                     className="text-sm font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 px-4 py-2 rounded-lg transition-colors"
                   >
                     {t('admin.events')}
                   </button>
                   <button 
-                    onClick={() => router.push(`/dashboard/edit/${club.id}`)}
+                    onClick={() => router.push(`/dashboard/edit-club?id=${club.id}`)}
                     className="text-sm font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg transition-colors"
                   >
                     {t('admin.edit')}

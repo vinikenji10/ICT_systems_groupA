@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -12,11 +12,11 @@ import { ADMIN_UIDS } from '@/app/utils/constants';
 import DefaultButton from '@/app/components/DefaultButton';
 import Image from 'next/image';
 
-export default function ClubDetails() {
+function ClubDetailsContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const clubId = params.id as string;
+  const searchParams = useSearchParams();
+  const clubId = searchParams.get('id') as string;
 
   const [club, setClub] = useState<Club | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -199,7 +199,7 @@ export default function ClubDetails() {
     if (!user) {
       router.push('/login');
     } else if (club) {
-      router.push(`/dashboard/edit/${club.id}`);
+      router.push(`/dashboard/edit-club?id=${club.id}`);
     }
   };
 
@@ -464,5 +464,13 @@ export default function ClubDetails() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ClubDetails() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-slate-500">Loading...</div>}>
+      <ClubDetailsContent />
+    </Suspense>
   );
 }

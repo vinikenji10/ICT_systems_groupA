@@ -80,12 +80,7 @@ export default function CampusEvents() {
       {/* Full bleed fixed background to break out of layout constraints */}
       <div className="fixed inset-0 bg-[#0d4f37] z-0 pointer-events-none" />
       
-      {/* Ambient background blur shapes for modern feel */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/40 blur-[120px]"></div>
-        <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-secondary/30 blur-[150px]"></div>
-        <div className="absolute bottom-[-20%] left-[10%] w-[50%] h-[50%] rounded-full bg-emerald-400/30 blur-[120px]"></div>
-      </div>
+
 
       <div className="relative z-10 w-full space-y-8 pb-8">
         <section className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
