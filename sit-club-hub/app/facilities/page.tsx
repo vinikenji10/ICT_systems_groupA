@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { Facility, Category } from '@/app/types';
 import SearchWidget from "@/app/components/SearchWidget";
 import CategoryFilter from "@/app/components/CategoryFilter";
-import Image from "next/image";
+import FadeInImage from "@/app/components/FadeInImage";
 
 export default function FacilitiesPage() {
   const { t, lang } = useTranslation();
@@ -19,47 +19,31 @@ export default function FacilitiesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
 
-  // Helper to force a timeout on hanging Promises
-  const fetchWithTimeout = async <T,>(promise: Promise<T>, ms: number = 4000): Promise<T> => {
-    return Promise.race([
-      promise,
-      new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
-    ]);
-  };
-
   useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'facilities'), (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Facility[];
+      
+      setFacilities(data);
+      setFilteredFacilities(data);
 
-    const fetchFacilities = async () => {
-      try {
-        const snapshot = await fetchWithTimeout(getDocs(collection(db, 'facilities')));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Facility[];
-        
-        setFacilities(data);
-        setFilteredFacilities(data);
+      // Extract building names for category filter
+      const buildings = Array.from(new Set(data.map(f => f.building).filter(Boolean)));
+      const categories: Category[] = buildings.map(b => ({
+        id: b,
+        name_en: b,
+        name_ja: b
+      }));
+      setDbCategories(categories);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching facilities:", error);
+      setLoading(false);
+    });
 
-        // Extract building names for category filter
-        const buildings = Array.from(new Set(data.map(f => f.building).filter(Boolean)));
-        const categories: Category[] = buildings.map(b => ({
-          id: b,
-          name_en: b,
-          name_ja: b
-        }));
-        setDbCategories(categories);
-
-      } catch (error) {
-        console.error("Error fetching facilities:", error);
-        if (error instanceof Error && error.message === "timeout") {
-          window.location.reload();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFacilities();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -126,16 +110,13 @@ export default function FacilitiesPage() {
               filteredFacilities.map((facility) => (
                 <div key={facility.id} className="bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:bg-white/90">
                   {facility.imageUrl && (
-                    <div className="h-44 w-full bg-slate-100 overflow-hidden shrink-0 relative">
-                      <Image
-                        src={facility.imageUrl}
-                        alt={lang === 'ja' ? facility.name_ja : facility.name_en}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover"
-                        unoptimized={true}
-                      />
-                    </div>
+                    <FadeInImage
+                      src={facility.imageUrl}
+                      alt={lang === 'ja' ? facility.name_ja : facility.name_en}
+                      className="h-44 w-full shrink-0"
+                      imageClassName="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                   )}
 
                   <div className="p-5 flex flex-col flex-grow">

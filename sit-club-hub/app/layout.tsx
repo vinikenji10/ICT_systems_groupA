@@ -21,9 +21,6 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "SIT Club Hub",
   description: "Discover student life at SIT",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({

@@ -10,7 +10,7 @@ import { useTranslation } from '@/app/contexts/useTranslation';
 import { Club, Category } from '@/app/types';
 import { ADMIN_UIDS } from '@/app/utils/constants';
 import DefaultButton from '@/app/components/DefaultButton';
-import Image from 'next/image';
+import FadeInImage from '@/app/components/FadeInImage';
 
 function ClubDetailsContent() {
   const { user, loading: authLoading } = useAuth();
@@ -215,12 +215,12 @@ function ClubDetailsContent() {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="h-64 w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
           {club.logoUrl ? (
-            <Image
+            <FadeInImage
               src={club.logoUrl.includes('shibaura_logo.png') ? '/shibaura_logo.png' : club.logoUrl}
               alt={`Banner of ${club.name_en}`}
-              fill
+              className="w-full h-full"
+              imageClassName="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
             />
           ) : (
             <span className="text-slate-400 font-medium">{t('club.bannerPlaceholder')}</span>
