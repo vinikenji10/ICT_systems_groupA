@@ -1,18 +1,99 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 7, 1);
+    
+    // ==============================================================================
+    // HELPER FUNCTIONS (Keeps the code clean and readable)
+    // ==============================================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    function isLeaderOf(clubId) {
+      return isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/clubs/$(clubId)).data.leaderIds;
+    }
+
+    // New helper to identify system administrators
+    // Add the UIDs of your team here to give them Firestore master access
+    function isAdmin() {
+      return isAuthenticated() && request.auth.uid in [
+        'Bf8woNamDMQLurgvocihNPFUeup1'
+        // 'OTHER_ADMIN_UID_HERE'
+      ];
+    }
+    
+    // ==============================================================================
+    // COLLECTION RULES
+    // ==============================================================================
+
+    // 1. USERS Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && request.resource.data.role == 'student';
+      
+      // Admins can update anything (like promoting roles), users can only update non-role fields
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 2. CLUBS Collection
+    match /clubs/{clubId} {
+      // Anyone can read public club information
+      allow read: if true; 
+      
+      // Leaders can update, Admins can do everything
+      allow update: if isLeaderOf(clubId) || isAdmin();
+      allow create, delete: if isAdmin();
+
+      // Secure: Only club leaders and admins access private data (like group links)
+      match /privateData/{docId} {
+        allow read, write: if isLeaderOf(clubId) || isAdmin();
+      }
+
+      // Reviews subcollection
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // 3. EVENTS Collection
+    match /events/{eventId} {
+      // Anyone can read event information as it is public
+      allow read: if true;
+      
+      // Leaders create/edit their own events, Admins can manage any event
+      allow create: if isLeaderOf(request.resource.data.clubId) || isAdmin();
+      allow update, delete: if isLeaderOf(resource.data.clubId) || isAdmin();
+    }
+
+    // 4. APPLICATIONS Collection
+    match /applications/{applicationId} {
+      // Students see their own apps, Leaders and Admins see apps for their clubs
+      allow read: if isOwner(resource.data.studentId) || isLeaderOf(resource.data.clubId) || isAdmin();
+      allow create: if isOwner(request.resource.data.studentId);
+      
+      // Leaders and Admins can approve/reject
+      allow update: if isLeaderOf(resource.data.clubId) || isAdmin();
+      allow delete: if isOwner(resource.data.studentId) || isAdmin();
+    }
+
+    // 5. CATEGORIES Collection (MISSING FROM PREVIOUS RULES)
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 6. FACILITIES Collection (MISSING FROM PREVIOUS RULES)
+    match /facilities/{facilityId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
