@@ -311,7 +311,7 @@ export const translations = {
     'events.checkBack': '後で確認してください',
     'events.viewClub': '部活詳細を見る',
     'events.loading': 'イベントを読み込んでいます...',
-    'events.tabList': 'リスト表示',
+    'events.tabList': '一覧表示',
     'events.tabCalendar': 'カレンダー表示',
     'events.eventDetails': 'イベント詳細',
     'events.location': '場所',
