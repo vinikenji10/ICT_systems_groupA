@@ -1,17 +1,24 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
 import { useTranslation } from '@/app/contexts/useTranslation';
 import { CampusEvent, Category } from '@/app/types';
 import EventCard from '@/app/components/EventCard';
 
+const EventsCalendar = dynamic(() => import('@/app/components/EventsCalendar'), {
+  ssr: false,
+  loading: () => <div className="text-center py-20 text-emerald-50 font-medium">Loading calendar...</div>
+});
+
 export default function CampusEvents() {
   const { t } = useTranslation();
   const [events, setEvents] = useState<CampusEvent[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'list' | 'calendar'>('calendar');
 
   useEffect(() => {
 
@@ -89,25 +96,55 @@ export default function CampusEvents() {
           </div>
         </section>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.length === 0 ? (
-          <div className="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
-            <p className="text-slate-500 font-medium">{t('events.noEvents')}</p>
-            <p className="text-sm text-slate-400 mt-1">{t('events.checkBack')}</p>
+        {/* Dynamic switcher tabs */}
+        <div className="flex justify-center">
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 p-1.5 rounded-2xl flex gap-1.5 shadow-lg">
+            <button
+              onClick={() => setActiveTab('list')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${
+                activeTab === 'list'
+                  ? 'bg-white text-[#0d4f37] shadow-md scale-102'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              {t('events.tabList')}
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${
+                activeTab === 'calendar'
+                  ? 'bg-white text-[#0d4f37] shadow-md scale-102'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              {t('events.tabCalendar')}
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'list' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.length === 0 ? (
+              <div className="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
+                <p className="text-slate-500 font-medium">{t('events.noEvents')}</p>
+                <p className="text-sm text-slate-400 mt-1">{t('events.checkBack')}</p>
+              </div>
+            ) : (
+              events.map((event) => {
+                const matchedCategory = categories.find((c) => c.id === event.category);
+                return (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    category={matchedCategory}
+                  />
+                );
+              })
+            )}
           </div>
         ) : (
-          events.map((event) => {
-            const matchedCategory = categories.find((c) => c.id === event.category);
-            return (
-              <EventCard
-                key={event.id}
-                event={event}
-                category={matchedCategory}
-              />
-            );
-          })
+          <EventsCalendar events={events} categories={categories} />
         )}
-      </div>
       </div>
     </div>
   );
