@@ -91,6 +91,14 @@ export default function Navbar() {
             >
               {t('nav.facilities')}
             </Link>
+            <Link 
+              href="/assistant" 
+              prefetch={false} 
+              onMouseEnter={handleMouseEnter}
+              className="text-[#0f4e3c] hover:text-primary font-medium transition-colors px-4 py-2"
+            >
+              {lang === 'ja' ? 'AIアシスタント' : 'AI Assistant'}
+            </Link>
             {userRole === 'leader' && (
               <Link 
                 href="/dashboard" 
@@ -180,6 +188,14 @@ export default function Navbar() {
               className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
             >
               {t('nav.facilities')}
+            </Link>
+            <Link 
+              href="/assistant" 
+              prefetch={false}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+            >
+              {lang === 'ja' ? 'AIアシスタント' : 'AI Assistant'}
             </Link>
             {userRole === 'leader' && (
               <Link 
