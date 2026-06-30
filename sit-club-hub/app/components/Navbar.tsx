@@ -68,6 +68,14 @@ export default function Navbar() {
             />
 
             <Link 
+              href="/about" 
+              prefetch={false} 
+              onMouseEnter={handleMouseEnter}
+              className="text-[#0f4e3c] hover:text-primary font-medium transition-colors px-4 py-2"
+            >
+              {lang === 'ja' ? 'アバウト' : 'About'}
+            </Link>
+            <Link 
               href="/clubs" 
               prefetch={false} 
               onMouseEnter={handleMouseEnter}
@@ -165,6 +173,14 @@ export default function Navbar() {
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-100 flex flex-col space-y-4 animate-in slide-in-from-top-2 fade-in duration-200">
+            <Link 
+              href="/about" 
+              prefetch={false}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[#0f4e3c] font-medium px-2 py-1 hover:bg-slate-50 rounded-md"
+            >
+              {lang === 'ja' ? 'アバウト' : 'About'}
+            </Link>
             <Link 
               href="/clubs" 
               prefetch={false}
